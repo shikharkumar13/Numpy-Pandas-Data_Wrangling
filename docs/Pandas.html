@@ -1,0 +1,1011 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pandas for Data Analysis: A Complete Beginner's Guide · Python Data Science Series</title>
+<meta name="description" content="A complete Pandas guide: Series, DataFrames, loc/iloc, filtering, merging, groupby, pivot tables and apply — with visual diagrams throughout.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>:root{
+  --bg:#EFF4F0;--bg-grid:rgba(20,80,40,.045);--surface:#fff;--surface-soft:#F4F8F5;
+  --ink:#0C1A10;--ink-soft:#2A4030;--ink-faint:#7A9A80;
+  --green:#1A6B3A;--green-text:#156030;--green-soft:rgba(26,107,58,.1);
+  --teal:#00897B;--teal-text:#00695C;--teal-soft:rgba(0,137,123,.1);
+  --amber:#E07B00;--amber-text:#B86400;--amber-soft:rgba(224,123,0,.11);
+  --line:#C8DDCC;--line-strong:#A8C8AC;
+  --code-bg:#001A10;--code-text:#C8E8D0;--code-line:#002818;
+  --r-s:6px;--r-m:10px;--r-l:16px;
+  --shadow:0 1px 3px rgba(12,26,16,.06),0 8px 28px -12px rgba(12,26,16,.14);
+  --font-d:'Space Grotesk','Arial Narrow',sans-serif;
+  --font-b:'IBM Plex Sans',-apple-system,'Segoe UI',sans-serif;
+  --font-m:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:linear-gradient(var(--bg-grid) 1px,transparent 1px) 0 0/28px 28px,linear-gradient(90deg,var(--bg-grid) 1px,transparent 1px) 0 0/28px 28px,var(--bg);color:var(--ink);font-family:var(--font-b);font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased;}
+a{color:var(--green-text);text-decoration-color:rgba(26,107,58,.3);text-underline-offset:2px;}
+a:hover{text-decoration-color:currentColor;}
+::selection{background:var(--green);color:#fff;}
+:focus-visible{outline:2.5px solid var(--teal);outline-offset:2px;border-radius:3px;}
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.15em;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ── Shell ── */
+.shell{max-width:1300px;margin:0 auto;padding:0 clamp(16px,4vw,44px);}
+.topbar{display:none;position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;padding:12px clamp(16px,4vw,44px);background:rgba(239,244,240,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+.topbar .brand{font-family:var(--font-d);font-weight:700;font-size:.93rem;}
+.topbar .brand span{color:var(--green-text);}
+.topbar button{border:1.5px solid var(--line-strong);background:var(--surface);border-radius:var(--r-s);width:38px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);}
+
+/* ── Hero ── */
+.hero{padding:clamp(48px,7vw,88px) 0 clamp(32px,5vw,52px);}
+.hero-eyebrow{font-family:var(--font-m);font-size:.77rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green-text);font-weight:500;display:flex;align-items:center;gap:.6em;margin-bottom:18px;}
+.hero-eyebrow::before{content:"";width:26px;height:2px;background:var(--green);display:inline-block;}
+h1.title{font-family:var(--font-d);font-weight:700;font-size:clamp(2rem,4.2vw,3.3rem);line-height:1.08;letter-spacing:-.02em;margin:0 0 18px;max-width:22ch;}
+h1.title em{font-style:normal;color:var(--green-text);}
+.hero-sub{font-size:clamp(1rem,1.55vw,1.16rem);color:var(--ink-soft);max-width:65ch;margin:0 0 30px;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:9px;}
+.chip{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);padding:8px 14px 8px 10px;border-radius:999px;font-family:var(--font-m);font-size:.76rem;color:var(--ink-soft);box-shadow:var(--shadow);}
+.chip .icon{width:1.1em;height:1.1em;}
+.chip:nth-child(1) .icon{color:var(--green);}
+.chip:nth-child(2) .icon{color:var(--teal);}
+.chip:nth-child(3) .icon{color:var(--amber);}
+.chip:nth-child(4) .icon{color:var(--green);}
+.chip:nth-child(5) .icon{color:var(--teal);}
+
+/* ── Page layout ── */
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:clamp(24px,4vw,52px);align-items:start;padding-bottom:100px;}
+.sidebar{position:sticky;top:28px;max-height:calc(100vh - 56px);overflow-y:auto;padding-right:6px;}
+.sidebar::-webkit-scrollbar{width:5px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px;}
+.toc-label{font-family:var(--font-m);font-size:.71rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin:4px 0 10px;padding-left:14px;}
+.toc{list-style:none;margin:0;padding:0;border-left:1.5px solid var(--line);}
+.toc li{margin:0;}
+.toc a{display:flex;align-items:center;gap:9px;padding:6px 14px;margin-left:-1.5px;padding-left:12.5px;border-left:1.5px solid transparent;font-size:.83rem;color:var(--ink-soft);text-decoration:none;transition:all .14s;border-radius:0 var(--r-s) var(--r-s) 0;}
+.toc a .icon{width:1em;height:1em;flex:none;color:var(--ink-faint);transition:color .14s;}
+.toc a:hover{color:var(--ink);background:var(--surface-soft);}
+.toc a.active{color:var(--green-text);border-left-color:var(--green);background:var(--green-soft);font-weight:500;}
+.toc a.active .icon{color:var(--green);}
+
+/* ── Prose ── */
+.article{min-width:0;padding-top:10px;}
+.article h2{font-family:var(--font-d);font-weight:600;font-size:clamp(1.45rem,2.4vw,1.82rem);letter-spacing:-.01em;margin:58px 0 16px;padding-top:8px;scroll-margin-top:22px;display:flex;align-items:center;gap:12px;}
+.article>h2:first-of-type{margin-top:6px;}
+.article h2 .h-icon{width:1.4rem;height:1.4rem;flex:none;color:var(--green);}
+.article h2 .h-icon .icon{width:100%;height:100%;}
+.article h3{font-family:var(--font-d);font-weight:600;font-size:1.08rem;margin:28px 0 10px;scroll-margin-top:22px;}
+.article p{margin:0 0 16px;}
+.article ul,.article ol{margin:0 0 18px;padding-left:1.3em;}
+.article li{margin-bottom:7px;}
+.article li::marker{color:var(--green);}
+.article strong{font-weight:600;}
+.article hr{border:none;border-top:1px solid var(--line);margin:44px 0;}
+.article code{font-family:var(--font-m);font-size:.85em;background:var(--surface-soft);border:1px solid var(--line);padding:.1em .36em;border-radius:4px;color:var(--teal-text);}
+.article blockquote{margin:20px 0;padding:12px 16px;border-left:3px solid var(--teal);background:var(--teal-soft);border-radius:0 var(--r-s) var(--r-s) 0;color:var(--ink-soft);}
+.article blockquote p{margin:0;color:inherit;}
+
+/* ── Tables ── */
+.table-wrap{overflow-x:auto;margin:20px 0 26px;border-radius:var(--r-m);box-shadow:var(--shadow);}
+.article table{width:100%;border-collapse:collapse;background:var(--surface);font-size:.88rem;}
+.article thead th{background:var(--green);color:#fff;font-family:var(--font-d);font-weight:600;text-align:left;padding:11px 15px;white-space:nowrap;font-size:.8rem;letter-spacing:.01em;}
+.article tbody td{padding:10px 15px;border-bottom:1px solid var(--line);vertical-align:top;}
+.article tbody tr:last-child td{border-bottom:none;}
+.article tbody tr:nth-child(even){background:var(--surface-soft);}
+.article tbody td code{white-space:nowrap;}
+
+/* ── Code cards ── */
+.code-card{margin:20px 0 24px;border-radius:var(--r-m);overflow:hidden;background:var(--code-bg);box-shadow:var(--shadow);}
+.code-card .code-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#00100A;border-bottom:1px solid var(--code-line);}
+.code-card .dots{display:flex;gap:5px;}
+.code-card .dots span{width:8px;height:8px;border-radius:50%;display:block;}
+.code-card .dots span:nth-child(1){background:#E8664A;}
+.code-card .dots span:nth-child(2){background:#E3B23C;}
+.code-card .dots span:nth-child(3){background:#3CB371;}
+.code-card .lang{font-family:var(--font-m);font-size:.7rem;color:#4A8A60;letter-spacing:.06em;}
+.code-card .copy-btn{font-family:var(--font-m);font-size:.7rem;color:#6A9A70;background:transparent;border:1px solid #0A3020;border-radius:5px;padding:3px 9px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .14s;}
+.code-card .copy-btn:hover{background:#002A18;color:#C8E8D0;border-color:#1A6040;}
+.code-card .copy-btn .icon{width:.9em;height:.9em;}
+.code-card pre{margin:0;padding:14px 18px;overflow-x:auto;}
+.code-card code{font-family:var(--font-m);font-size:.855rem;line-height:1.6;color:var(--code-text);background:none;border:none;padding:0;}
+/* tokens */
+.code-card .k,.code-card .kn,.code-card .kd{color:#7EC8A0;}
+.code-card .nb{color:#7EC8A0;}
+.code-card .nf,.code-card .fm{color:#60D0B8;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa{color:#C8D96A;}
+.code-card .mi,.code-card .mf{color:#F5A34A;}
+.code-card .o,.code-card .p{color:#4A7A60;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#2A5A40;font-style:italic;}
+.code-card .n{color:var(--code-text);}
+.code-card .nc{color:#F0D060;}
+
+/* ── Diagram cards ── */
+.diagram-card{margin:20px 0 24px;border-radius:var(--r-m);overflow:hidden;position:relative;border:1.5px dashed var(--line-strong);background:linear-gradient(var(--bg-grid) 1px,transparent 1px) 0 0/18px 18px,linear-gradient(90deg,var(--bg-grid) 1px,transparent 1px) 0 0/18px 18px,var(--surface-soft);}
+.diagram-card::before{content:"diagram";position:absolute;top:9px;right:12px;font-family:var(--font-m);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);}
+.diagram-card pre{margin:0;padding:24px 20px 18px;overflow-x:auto;}
+.diagram-card code{font-family:var(--font-m);font-size:.8rem;line-height:1.55;color:var(--ink-soft);background:none;border:none;padding:0;white-space:pre;}
+
+/* ── Workflow card ── */
+.workflow-card{margin:24px 0 28px;border-radius:var(--r-l);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--surface);}
+.workflow-card .wf-head{background:var(--green);color:#fff;padding:14px 20px;font-family:var(--font-d);font-weight:600;font-size:.95rem;letter-spacing:.01em;}
+.workflow-steps{display:flex;flex-direction:column;padding:8px 0;}
+.wf-step{display:flex;align-items:flex-start;gap:16px;padding:12px 20px;}
+.wf-step:not(:last-child){border-bottom:1px solid var(--line);}
+.wf-num{width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;font-family:var(--font-d);font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex:none;}
+.wf-content{flex:1;}
+.wf-content strong{font-family:var(--font-d);font-weight:600;font-size:.95rem;display:block;margin-bottom:3px;color:var(--green-text);}
+.wf-content code{font-family:var(--font-m);font-size:.82em;color:var(--teal-text);background:var(--surface-soft);border:1px solid var(--line);padding:.1em .32em;border-radius:3px;}
+.wf-content span{font-size:.88rem;color:var(--ink-soft);}
+
+/* ── Article end ── */
+.article-end{margin-top:52px;padding:26px 24px;border-radius:var(--r-m);background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);}
+.article-end p{margin:0;font-size:1rem;color:var(--ink-soft);}
+.article-end p strong{color:var(--ink);}
+
+footer.site-footer{border-top:1px solid var(--line);margin-top:36px;padding:22px clamp(16px,4vw,44px) 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer.site-footer .f-left{font-family:var(--font-m);font-size:.76rem;color:var(--ink-faint);}
+footer.site-footer a{font-size:.8rem;color:var(--ink-soft);}
+
+@media(max-width:960px){
+  .topbar{display:flex;}
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:fixed;inset:57px 0 0 0;z-index:35;background:var(--bg);padding:16px clamp(16px,4vw,44px) 24px;transform:translateX(-100%);transition:transform .2s;max-height:none;height:calc(100vh - 57px);}
+  .sidebar.open{transform:translateX(0);}
+  .workflow-card .wf-step{padding:10px 16px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true"><defs>
+<symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".9" fill="currentColor" stroke="none"/></symbol>
+<symbol id="icon-series" viewBox="0 0 24 24"><rect x="4" y="2" width="7" height="5" rx="1"/><rect x="4" y="9.5" width="7" height="5" rx="1"/><rect x="4" y="17" width="7" height="5" rx="1"/><line x1="11" y1="4.5" x2="20" y2="4.5"/><line x1="11" y1="12" x2="20" y2="12"/><line x1="11" y1="19.5" x2="20" y2="19.5"/></symbol>
+<symbol id="icon-dataframe" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="8" y1="3" x2="8" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="2" y1="15" x2="22" y2="15"/></symbol>
+<symbol id="icon-index" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="8" y1="3" x2="8" y2="21"/><circle cx="5" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="5" cy="18" r="1.3" fill="currentColor" stroke="none"/><rect x="10" y="11.5" width="10" height="4" rx=".8" fill="currentColor" stroke="none" opacity=".45"/></symbol>
+<symbol id="icon-lociloc" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="8" y1="3" x2="8" y2="21"/><rect x="10" y="5.5" width="10" height="5" rx=".8" fill="currentColor" stroke="none" opacity=".5"/><rect x="10" y="13" width="6" height="5" rx=".8" fill="currentColor" stroke="none" opacity=".8"/></symbol>
+<symbol id="icon-filter" viewBox="0 0 24 24"><polygon points="3,4 21,4 14,13 14,21 10,18 10,13"/></symbol>
+<symbol id="icon-sort" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="11" x2="16" y2="11"/><line x1="3" y1="16" x2="10" y2="16"/><polyline points="18,13 21,16 18,19"/></symbol>
+<symbol id="icon-merge" viewBox="0 0 24 24"><rect x="1.5" y="3" width="8" height="5" rx="1"/><rect x="14.5" y="3" width="8" height="5" rx="1"/><line x1="5.5" y1="8" x2="12" y2="16"/><line x1="18.5" y1="8" x2="12" y2="16"/><rect x="8" y="16" width="8" height="5" rx="1"/></symbol>
+<symbol id="icon-groupby" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="4" rx="1"/><rect x="2" y="8" width="9" height="4" rx="1" opacity=".6" fill="currentColor" stroke="none"/><rect x="13" y="8" width="9" height="4" rx="1" opacity=".6" fill="currentColor" stroke="none"/><rect x="2" y="14" width="4" height="8" rx="1" opacity=".4" fill="currentColor" stroke="none"/><rect x="8" y="14" width="4" height="8" rx="1" opacity=".4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="8" rx="1" opacity=".4" fill="currentColor" stroke="none"/><rect x="20" y="14" width="4" height="8" rx="1" opacity=".4" fill="currentColor" stroke="none"/></symbol>
+<symbol id="icon-pivot" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="1.5"/><line x1="2" y1="8" x2="22" y2="8"/><line x1="8" y1="2" x2="8" y2="22"/><rect x="9.5" y="9.5" width="5.5" height="5.5" fill="currentColor" stroke="none" opacity=".7"/><rect x="9.5" y="15.5" width="5.5" height="5.5" fill="currentColor" stroke="none" opacity=".35"/><rect x="15.5" y="9.5" width="5.5" height="5.5" fill="currentColor" stroke="none" opacity=".35"/></symbol>
+<symbol id="icon-apply" viewBox="0 0 24 24"><path d="M4 6 L20 6"/><path d="M4 10 L14 10"/><path d="M4 14 L11 14"/><circle cx="18" cy="15" r="4.5"/><path d="M16 15 L18 17 L21 13" stroke-width="1.4"/></symbol>
+<symbol id="icon-workflow" viewBox="0 0 24 24"><rect x="2" y="3" width="6" height="4" rx="1"/><rect x="2" y="10" width="6" height="4" rx="1"/><rect x="2" y="17" width="6" height="4" rx="1"/><line x1="8" y1="5" x2="22" y2="5"/><line x1="8" y1="12" x2="22" y2="12"/><line x1="8" y1="19" x2="22" y2="19"/></symbol>
+<symbol id="icon-table" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15.5" y1="3" x2="15.5" y2="21"/></symbol>
+<symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="1.6"/><path d="M5 16H4.5A1.5 1.5 0 0 1 3 14.5v-10A1.5 1.5 0 0 1 4.5 3h10A1.5 1.5 0 0 1 16 4.5V5"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12.5 L9.5 18 L20 5"/></symbol>
+<symbol id="icon-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+<symbol id="icon-close" viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></symbol>
+</defs></svg>
+
+<div class="topbar">
+  <span class="brand">§12 &nbsp;<span>Pandas</span></span>
+  <button id="navToggle" aria-label="Toggle navigation">
+    <svg class="icon"><use href="#icon-menu"></use></svg>
+  </button>
+</div>
+
+<div class="shell">
+  <section class="hero">
+    <div class="hero-eyebrow">Python Data Science Series &nbsp;·&nbsp; Article 12</div>
+    <h1 class="title">Pandas for Data Analysis: A Complete Beginner's Guide</h1>
+    <p class="hero-sub">If Python is the language of data science, then <strong>Pandas is its workhorse.</strong> Almost every data analysis task, cleaning messy spreadsheets, filtering millions of rows, summarizing sales by region, joining data from different sources, runs through Pandas. Learning to manipulate data with it quickly is arguably <em>the</em> most important practical skill in data analysis.</p>
+    <div class="hero-chips">
+      <div class="chip"><svg class="icon"><use href="#icon-series"></use></svg> Series &amp; DataFrames</div>
+      <div class="chip"><svg class="icon"><use href="#icon-lociloc"></use></svg> loc &amp; iloc demystified</div>
+      <div class="chip"><svg class="icon"><use href="#icon-filter"></use></svg> Boolean filtering</div>
+      <div class="chip"><svg class="icon"><use href="#icon-merge"></use></svg> Merge vs Concatenate</div>
+      <div class="chip"><svg class="icon"><use href="#icon-groupby"></use></svg> GroupBy &amp; Pivot Tables</div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="toc-label">On this page</div>
+      <ul class="toc">
+        <li><a href="#what-is-pandas"><svg class="icon"><use href="#icon-info"></use></svg><span>What Is Pandas?</span></a></li>
+<li><a href="#part-1-the-pandas-series"><svg class="icon"><use href="#icon-series"></use></svg><span>Part 1: The Pandas Series</span></a></li>
+<li><a href="#part-2-the-pandas-dataframe"><svg class="icon"><use href="#icon-dataframe"></use></svg><span>Part 2: The Pandas DataFrame</span></a></li>
+<li><a href="#part-3-indexing-and-slicing-a-dataframe"><svg class="icon"><use href="#icon-index"></use></svg><span>Part 3: Indexing and Slicing a DataFrame</span></a></li>
+<li><a href="#part-4-the-right-way-loc-and-iloc"><svg class="icon"><use href="#icon-lociloc"></use></svg><span>Part 4: The Right Way — loc and iloc</span></a></li>
+<li><a href="#part-5-filtering-data-with-conditions"><svg class="icon"><use href="#icon-filter"></use></svg><span>Part 5: Filtering Data with Conditions</span></a></li>
+<li><a href="#part-6-sorting-data"><svg class="icon"><use href="#icon-sort"></use></svg><span>Part 6: Sorting Data</span></a></li>
+<li><a href="#part-7-combining-dataframes-merge-vs-concatenate"><svg class="icon"><use href="#icon-merge"></use></svg><span>Part 7: Combining DataFrames — Merge vs Concatenate</span></a></li>
+<li><a href="#part-8-grouping-and-summarizing-the-split-apply-combine-pattern"><svg class="icon"><use href="#icon-groupby"></use></svg><span>Part 8: Grouping and Summarizing — The "Split-Apply-Combine" Pattern</span></a></li>
+<li><a href="#part-9-pivot-tables"><svg class="icon"><use href="#icon-pivot"></use></svg><span>Part 9: Pivot Tables</span></a></li>
+<li><a href="#part-10-applying-functions-with-apply-and-lambda"><svg class="icon"><use href="#icon-series"></use></svg><span>Part 10: Applying Functions with apply and Lambda</span></a></li>
+<li><a href="#the-complete-pandas-workflow-at-a-glance"><svg class="icon"><use href="#icon-workflow"></use></svg><span>The Complete Pandas Workflow at a Glance</span></a></li>
+<li><a href="#quick-reference-summary"><svg class="icon"><use href="#icon-table"></use></svg><span>Quick Reference Summary</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="article">
+      <p>This guide walks through the entire Pandas workflow from the ground up, using a real retail sales dataset as the running example. Throughout, you'll find <strong>visual diagrams</strong> that show exactly what's happening to your data at each step, because data manipulation is so much easier to understand when you can <em>see</em> it.</p>
+<hr />
+<h2 id="what-is-pandas"><span class="h-icon"><svg class="icon"><use href="#icon-info"></use></svg></span>What Is Pandas?</h2>
+<p>Pandas is a Python library built on top of another library called <strong>NumPy</strong>, designed specifically for data analysis. You'll use it constantly for data manipulation, preparing data for visualization, and building machine learning models.</p>
+<p>To use it, you import it with the near-universal nickname <code>pd</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</code></pre></div>
+
+<p>Pandas has <strong>two core data structures</strong>, and everything else builds on them:</p>
+<div class="diagram-card"><pre><code>   SERIES                         DATAFRAME
+   (one column)                   (a whole table)
+
+   ┌─────────┐                    ┌──────┬────────┬───────┐
+   │ Maths   │                    │ id   │ Profit │ Sales │
+   │ ML      │                    ├──────┼────────┼───────┤
+   │ Python  │                    │ 101  │   12   │  345  │
+   │ Data    │                    │ 102  │   14   │  765  │
+   │ Science │                    │ 103  │   21   │  321  │
+   │ Java    │                    │ 104  │   65   │  876  │
+   └─────────┘                    └──────┴────────┴───────┘
+
+   1-dimensional                  2-dimensional
+</code></pre></div>
+
+<p>A <strong>Series</strong> is a single column of data. A <strong>DataFrame</strong> is a full table, and you can think of a DataFrame as simply a bunch of Series stacked side by side. The DataFrame is what you'll work with 95% of the time.</p>
+<hr />
+<h2 id="part-1-the-pandas-series"><span class="h-icon"><svg class="icon"><use href="#icon-series"></use></svg></span>Part 1: The Pandas Series</h2>
+<p>A <strong>Series</strong> is like a one-dimensional array, but instead of being a row, it's represented as a single column. Critically, every value in a Series has an <strong>index</strong> (a label) attached to it.</p>
+<h3 id="creating-a-series">Creating a Series</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">text_series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s1">&#39;Maths&#39;</span><span class="p">,</span> <span class="s1">&#39;ML&#39;</span><span class="p">,</span> <span class="s1">&#39;Python&#39;</span><span class="p">,</span> <span class="s1">&#39;Data&#39;</span><span class="p">,</span> <span class="s1">&#39;Science&#39;</span><span class="p">,</span> <span class="s1">&#39;Java&#39;</span><span class="p">])</span>
+</code></pre></div>
+
+<p>Here's what Pandas builds — the index on the left is added automatically:</p>
+<div class="diagram-card"><pre><code> index   value
+   0   │  Maths
+   1   │  ML
+   2   │  Python
+   3   │  Data
+   4   │  Science
+   5   │  Java
+</code></pre></div>
+
+<h3 id="inspecting-a-series">Inspecting a Series</h3>
+<p>Pandas gives you a set of attributes to examine any Series. Most have <em>no</em> parentheses because they're properties that describe the object rather than actions it performs. The exception is <code>memory_usage()</code>, which is a method (it does a small calculation to include the index size).</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>What it returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>text_series.index</code></td>
+<td>The range of index labels</td>
+</tr>
+<tr>
+<td><code>text_series.values</code></td>
+<td>The values as a NumPy array</td>
+</tr>
+<tr>
+<td><code>text_series.array</code></td>
+<td>The values as a Pandas array</td>
+</tr>
+<tr>
+<td><code>text_series.shape</code></td>
+<td>The dimensions, e.g. <code>(6,)</code></td>
+</tr>
+<tr>
+<td><code>text_series.ndim</code></td>
+<td>Number of dimensions (always <code>1</code> for a Series)</td>
+</tr>
+<tr>
+<td><code>text_series.size</code></td>
+<td>Total number of elements</td>
+</tr>
+<tr>
+<td><code>text_series.nbytes</code></td>
+<td>Memory used by the <strong>values</strong> (property, no parentheses)</td>
+</tr>
+<tr>
+<td><code>text_series.memory_usage()</code></td>
+<td>Memory used by the values <strong>and</strong> the index (method, needs parentheses)</td>
+</tr>
+</tbody>
+</table></div>
+<p>One thing worth knowing on recent Pandas versions: <code>.values</code> doesn't always hand back a plain NumPy array. For a numeric Series it does, but text columns are now backed by Pandas's own <code>StringArray</code> by default, so <code>.values</code> on a text Series returns that instead. If you specifically need a NumPy array regardless of dtype, use <code>.to_numpy()</code>.</p>
+<h3 id="naming-a-series">Naming a Series</h3>
+<p>You can give a Series a name, which becomes its column header when it joins a DataFrame:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">text_series_2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="s1">&#39;Maths&#39;</span><span class="p">,</span> <span class="s1">&#39;ML&#39;</span><span class="p">,</span> <span class="s1">&#39;Python&#39;</span><span class="p">,</span> <span class="s1">&#39;Data&#39;</span><span class="p">,</span> <span class="s1">&#39;Science&#39;</span><span class="p">,</span> <span class="s1">&#39;Java&#39;</span><span class="p">],</span>
+                          <span class="n">name</span><span class="o">=</span><span class="s1">&#39;text series&#39;</span><span class="p">)</span>
+<span class="n">text_series_2</span><span class="o">.</span><span class="n">name</span>    <span class="c1"># &#39;text series&#39;</span>
+</code></pre></div>
+
+<h3 id="accessing-series-data">Accessing Series Data</h3>
+<p>You access elements much like a list:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">text_series_2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>      <span class="c1"># &#39;Maths&#39; — single element</span>
+<span class="n">text_series</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>      <span class="c1"># the first four elements (a slice)</span>
+</code></pre></div>
+
+<h3 id="a-subtle-but-important-point-custom-indexes">A Subtle but Important Point: Custom Indexes</h3>
+<p>You can assign your <em>own</em> index labels instead of the default <code>0, 1, 2...</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">num_series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">90</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">78</span><span class="p">,</span> <span class="mi">98</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">43</span><span class="p">,</span> <span class="mi">34</span><span class="p">],</span>
+                       <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code> YOUR index    value
+     5      │   90
+     6      │   23
+     7      │   45      ← num_series[7] returns 45
+     8      │   21
+     9      │   78
+    10      │   98
+    ...     │  ...
+</code></pre></div>
+
+<p>Now here's a quirk that trips up many beginners. When you have a custom index, <strong>indexing and slicing behave differently</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">num_series</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>      <span class="c1"># returns 45 → uses YOUR label (explicit index)</span>
+<span class="n">num_series</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span>    <span class="c1"># uses POSITION 2 to 6 (implicit index)</span>
+</code></pre></div>
+
+<ul>
+<li><strong>Indexing</strong> with a single value uses your <strong>explicit</strong> (custom) index labels.</li>
+<li><strong>Slicing</strong> with a range uses the <strong>implicit</strong> (default positional) index.</li>
+</ul>
+<p>This inconsistency is exactly why Pandas gives us two dedicated tools, <code>loc</code> and <code>iloc</code>, to remove all ambiguity. We'll get to those shortly.</p>
+<hr />
+<h2 id="part-2-the-pandas-dataframe"><span class="h-icon"><svg class="icon"><use href="#icon-dataframe"></use></svg></span>Part 2: The Pandas DataFrame</h2>
+<p>The <strong>DataFrame</strong> is the star of the show, a table with labeled rows (the index) and named columns. This is the structure you'll spend nearly all your time working with.</p>
+<h3 id="creating-a-dataframe-from-a-dictionary">Creating a DataFrame from a Dictionary</h3>
+<p>The keys become column names, and the values (lists) become the columns:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Cust_id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span> <span class="mi">102</span><span class="p">,</span> <span class="mi">103</span><span class="p">,</span> <span class="mi">104</span><span class="p">,</span> <span class="mi">105</span><span class="p">],</span>
+                   <span class="s1">&#39;Profit&#39;</span><span class="p">:</span>  <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">89</span><span class="p">],</span>
+                   <span class="s1">&#39;Sales&#39;</span><span class="p">:</span>   <span class="p">[</span><span class="mi">345</span><span class="p">,</span> <span class="mi">765</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">876</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]})</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   ┌─────────┬────────┬───────┐
+   │ Cust_id │ Profit │ Sales │
+   ├─────────┼────────┼───────┤
+ 0 │   101   │   12   │  345  │
+ 1 │   102   │   14   │  765  │
+ 2 │   103   │   21   │  321  │
+ 3 │   104   │   65   │  876  │
+ 4 │   105   │   89   │  NaN  │  ← np.nan means &quot;missing value&quot;
+   └─────────┴────────┴───────┘
+</code></pre></div>
+
+<p>That <code>NaN</code> ("Not a Number") is how Pandas represents <strong>missing data</strong>, an empty cell. You'll meet it constantly in real datasets, and handling it is a core part of data cleaning.</p>
+<blockquote><p>Think of it like a paper form where someone skipped a field. The form isn't invalid, one box is just blank. <code>NaN</code> is Pandas's way of marking that blank box instead of guessing a value or crashing.</p></blockquote>
+<h3 id="creating-a-dataframe-from-a-csv-file">Creating a DataFrame from a CSV File</h3>
+<p>In the real world, your data usually lives in files. The <code>read_csv</code> function loads a CSV straight into a DataFrame:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">market</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;market_fact.csv&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>This single line is the starting point of almost every data analysis project.</p>
+<h3 id="first-steps-getting-to-know-your-data">First Steps: Getting to Know Your Data</h3>
+<p>Whenever you load a new dataset, you run a handful of commands to understand what you're dealing with. These are your "first look" toolkit:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it tells you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>market.head()</code></td>
+<td>The first 5 rows (peek at the top)</td>
+</tr>
+<tr>
+<td><code>market.tail()</code></td>
+<td>The last 5 rows (peek at the bottom)</td>
+</tr>
+<tr>
+<td><code>market.shape</code></td>
+<td><code>(rows, columns)</code>. The size of your data</td>
+</tr>
+<tr>
+<td><code>market.info()</code></td>
+<td>Column names, data types, and missing-value counts</td>
+</tr>
+<tr>
+<td><code>market.describe()</code></td>
+<td>Statistical summary (mean, min, max...) for numeric columns</td>
+</tr>
+<tr>
+<td><code>market.describe(include='object')</code></td>
+<td>Summary for text columns instead</td>
+</tr>
+<tr>
+<td><code>market.columns</code></td>
+<td>A list of all column names</td>
+</tr>
+<tr>
+<td><code>market.keys()</code></td>
+<td>Same as <code>.columns</code>, a list of column names</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>head()</code> and <code>info()</code> are the two you'll run most. <code>head()</code> shows you what the data <em>looks</em> like. <code>info()</code> tells you what's <em>in</em> it and whether anything's missing.</p>
+<hr />
+<h2 id="part-3-indexing-and-slicing-a-dataframe"><span class="h-icon"><svg class="icon"><use href="#icon-index"></use></svg></span>Part 3: Indexing and Slicing a DataFrame</h2>
+<p>Selecting the specific rows and columns you need is the most fundamental skill in Pandas. Let's start with the basic approaches.</p>
+<h3 id="selecting-rows-by-position">Selecting Rows by Position</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">market</span><span class="p">[</span><span class="mi">100</span><span class="p">:</span><span class="mi">501</span><span class="p">]</span>         <span class="c1"># rows 100 through 500</span>
+<span class="n">market</span><span class="p">[</span><span class="mi">100</span><span class="p">:</span><span class="mi">1001</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>     <span class="c1"># rows 100 to 1000, taking every 10th row</span>
+</code></pre></div>
+
+<h3 id="selecting-columns">Selecting Columns</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">market</span><span class="p">[</span><span class="s1">&#39;Sales&#39;</span><span class="p">]</span>                          <span class="c1"># a single column → returns a Series</span>
+<span class="n">market</span><span class="p">[[</span><span class="s1">&#39;Profit&#39;</span><span class="p">,</span> <span class="s1">&#39;Sales&#39;</span><span class="p">,</span> <span class="s1">&#39;Discount&#39;</span><span class="p">]]</span>  <span class="c1"># multiple columns → returns a DataFrame</span>
+</code></pre></div>
+
+<p>Note the difference in brackets, and what comes back:</p>
+<div class="diagram-card"><pre><code> market[&#39;Sales&#39;]              market[[&#39;Profit&#39;,&#39;Sales&#39;]]
+ (single brackets)            (double brackets — a LIST of columns)
+
+ → a SERIES                   → a DATAFRAME
+ ┌───────┐                    ┌────────┬───────┐
+ │ Sales │                    │ Profit │ Sales │
+ ├───────┤                    ├────────┼───────┤
+ │  345  │                    │   12   │  345  │
+ │  765  │                    │   14   │  765  │
+ └───────┘                    └────────┴───────┘
+</code></pre></div>
+
+<p>The rule: <strong>single brackets give a Series, double brackets give a DataFrame.</strong> When you want multiple columns, you pass a <em>list</em> of names, and a list itself needs square brackets, which is why you see two sets.</p>
+<hr />
+<h2 id="part-4-the-right-way-loc-and-iloc"><span class="h-icon"><svg class="icon"><use href="#icon-lociloc"></use></svg></span>Part 4: The Right Way — <code>loc</code> and <code>iloc</code></h2>
+<p>The plain indexing above works, but it has the ambiguity problems we saw with Series. Pandas solves this with two precise selection tools. Mastering these is what separates a beginner from someone who's comfortable in Pandas.</p>
+<p>The mental model:</p>
+<div class="diagram-card"><pre><code>   iloc  →  selects by POSITION  (i = integer)   →  always 0, 1, 2, 3...
+   loc   →  selects by LABEL     (l = label)     →  uses the actual index/column names
+</code></pre></div>
+
+<blockquote><p>It's the difference between "give me the third person in line" (<code>iloc</code>, a seat number that never changes) and "give me the person named Priya" (<code>loc</code>, a name that stays attached to them no matter where they move in line).</p></blockquote>
+<h3 id="iloc-selection-by-position"><code>iloc</code> — Selection by Position</h3>
+<p><code>iloc</code> uses <strong>integer positions only</strong>, exactly like coordinates on a grid. The format is <code>iloc[rows, columns]</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">market</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>              <span class="c1"># the entire row at position 2</span>
+<span class="n">market</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>           <span class="c1"># single cell: row 3, column 7</span>
+<span class="n">market</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span>         <span class="c1"># row 2, columns at positions 4 to 7</span>
+<span class="n">market</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span>       <span class="c1"># rows 0-5, columns 3-7 (a rectangular block)</span>
+<span class="n">market</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">9</span><span class="p">]]</span>   <span class="c1"># specific rows AND specific columns</span>
+</code></pre></div>
+
+<p>Visually, <code>iloc[0:6, 3:8]</code> grabs a rectangular block by position:</p>
+<div class="diagram-card"><pre><code>        col0 col1 col2 │col3 col4 col5 col6 col7│ col8
+ row0    .    .    .   │ ███  ███  ███  ███  ███ │  .
+ row1    .    .    .   │ ███  ███  ███  ███  ███ │  .
+ row2    .    .    .   │ ███  ███  ███  ███  ███ │  .
+ row3    .    .    .   │ ███  ███  ███  ███  ███ │  .
+ row4    .    .    .   │ ███  ███  ███  ███  ███ │  .
+ row5    .    .    .   │ ███  ███  ███  ███  ███ │  .
+ ─────                 └────────────────────────┘
+ row6    .    .    .     .    .    .    .    .      .
+                         (the shaded block is what you get)
+</code></pre></div>
+
+<h3 id="loc-selection-by-label"><code>loc</code> — Selection by Label</h3>
+<p><code>loc</code> uses the actual <strong>labels</strong>. The index values and column <em>names</em>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">market</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">,</span> <span class="s1">&#39;Sales&#39;</span><span class="p">]]</span>           <span class="c1"># row labeled 2, named columns</span>
+<span class="n">market</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">21</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Sales&#39;</span><span class="p">,</span> <span class="s1">&#39;Profit&#39;</span><span class="p">]]</span>        <span class="c1"># row labels 10-21, specific columns by name</span>
+</code></pre></div>
+
+<h3 id="one-key-difference-slicing-behavior">One Key Difference: Slicing Behavior</h3>
+<p>There's an important distinction in how the two handle ranges:</p>
+<div class="diagram-card"><pre><code>   iloc[0:6]  →  stops BEFORE 6  →  gives positions 0,1,2,3,4,5   (6 rows)
+   loc[10:21] →  INCLUDES 21     →  gives labels 10 through 21    (inclusive)
+</code></pre></div>
+
+<p><code>iloc</code> excludes the endpoint (like normal Python slicing). <code>loc</code> <em>includes</em> it, because with labels it would be confusing to leave out the exact row you named.</p>
+<h3 id="why-this-matters-changing-the-index">Why This Matters: Changing the Index</h3>
+<p>Here's where <code>loc</code> becomes essential. Suppose we replace the default numeric index with a meaningful column:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">market_copy</span> <span class="o">=</span> <span class="n">market</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>                       <span class="c1"># always work on a copy!</span>
+<span class="n">market_copy</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Cust_id&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>    <span class="c1"># make Cust_id the new index</span>
+</code></pre></div>
+
+<p>Now the index is customer IDs like <code>Cust_1818</code> instead of <code>0, 1, 2...</code>:</p>
+<div class="diagram-card"><pre><code>  BEFORE set_index            AFTER set_index
+  ┌───┬───────────┐           ┌───────────┬────────┐
+  │ # │  Cust_id  │           │ (index)   │ Profit │
+  ├───┼───────────┤           ├───────────┼────────┤
+  │ 0 │ Cust_1818 │    →      │ Cust_1818 │   ...  │
+  │ 1 │ Cust_1755 │           │ Cust_1755 │   ...  │
+  └───┴───────────┘           └───────────┴────────┘
+</code></pre></div>
+
+<p>To select by this new index, you <strong>must</strong> use <code>loc</code>, because <code>iloc</code> only ever understands positions:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">market_copy</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Cust_1818&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">,</span> <span class="s1">&#39;Sales&#39;</span><span class="p">]]</span>   <span class="c1"># works perfectly</span>
+</code></pre></div>
+
+<p>The <code>.copy()</code> method creates an independent duplicate, so changes to <code>market_copy</code> don't affect the original <code>market</code>. And <code>inplace=True</code> tells Pandas to modify the DataFrame directly rather than returning a new one.</p>
+<hr />
+<h2 id="part-5-filtering-data-with-conditions"><span class="h-icon"><svg class="icon"><use href="#icon-filter"></use></svg></span>Part 5: Filtering Data with Conditions</h2>
+<p>This is one of the most useful things Pandas does. <strong>Filtering</strong> means selecting only the rows that meet a condition, like "show me only the unprofitable sales."</p>
+<h3 id="how-filtering-works-under-the-hood">How Filtering Works Under the Hood</h3>
+<p>A condition on a column produces a Series of <code>True</code>/<code>False</code> values, one for each row. This is called a <strong>boolean mask</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">market</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code> row    Profit      Profit &lt; 0
+  0  │    52    │     False
+  1  │   -30    │     True
+  2  │    18    │     False
+  3  │   -45    │     True
+  4  │    91    │     False
+</code></pre></div>
+
+<p>When you pass this mask back into the DataFrame, Pandas <strong>keeps only the rows where the mask is <code>True</code></strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">market</span><span class="p">[</span><span class="n">market</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span>    <span class="c1"># only the loss-making rows</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   The mask        applied to data      gives only True rows
+   ────────        ───────────────      ───────────────────
+   False              [keep? no]
+   True       →       [keep? YES]   →    ┌─ row 1 (Profit -30) ─┐
+   False              [keep? no]         └─ row 3 (Profit -45) ─┘
+   True               [keep? YES]
+   False              [keep? no]
+</code></pre></div>
+
+<h3 id="combining-multiple-conditions">Combining Multiple Conditions</h3>
+<p>You can stack conditions together using three operators. <strong>Important:</strong> in Pandas you use the symbols <code>&amp;</code>, <code>|</code>, <code>~</code> (not the words <code>and</code>, <code>or</code>, <code>not</code>), and <strong>each condition must be wrapped in its own parentheses</strong>.</p>
+<p>Skip the parentheses and you'll hit a genuinely confusing error, because <code>&amp;</code> binds <em>tighter</em> than comparison operators like <code>&gt;</code> in Python, so the expression gets grouped in a way you didn't intend:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">market</span><span class="p">[</span><span class="n">market</span><span class="p">[</span><span class="s1">&#39;Sales&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;</span> <span class="n">market</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span>   <span class="c1"># missing parens</span>
+<span class="c1"># ValueError: The truth value of a Series is ambiguous.</span>
+<span class="c1"># Use a.empty, a.bool(), a.item(), a.any() or a.all().</span>
+</code></pre></div>
+<p>Wrapping each side in its own parentheses forces Python to evaluate the two comparisons first, and only then combine them with <code>&amp;</code>, which is exactly what you want:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Meaning</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&amp;</code></td>
+<td>AND (both must be true)</td>
+<td><code>(A) &amp; (B)</code></td>
+</tr>
+<tr>
+<td><code>|</code></td>
+<td>OR (either can be true)</td>
+<td><code>(A) | (B)</code></td>
+</tr>
+<tr>
+<td><code>~</code></td>
+<td>NOT (reverses the condition)</td>
+<td><code>~(A)</code></td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># AND — sales positive AND making a loss (sold but lost money)</span>
+<span class="n">market</span><span class="p">[(</span><span class="n">market</span><span class="p">[</span><span class="s1">&#39;Sales&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">market</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)]</span>
+
+<span class="c1"># OR — either condition is enough</span>
+<span class="n">market</span><span class="p">[(</span><span class="n">market</span><span class="p">[</span><span class="s1">&#39;Sales&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">market</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)]</span>
+
+<span class="c1"># NOT — the opposite of &quot;profit &gt;= 0&quot;</span>
+<span class="n">market</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">market</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)]</span>
+</code></pre></div>
+
+<h3 id="filtering-on-text-and-combining-with-column-selection">Filtering on Text and Combining with Column Selection</h3>
+<p>You can filter on text columns too, and combine a filter with <code>loc</code> to grab specific columns from the matching rows:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># Find one specific customer</span>
+<span class="n">market</span><span class="p">[</span><span class="n">market</span><span class="p">[</span><span class="s1">&#39;Cust_id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Cust_1818&#39;</span><span class="p">]</span>
+
+<span class="c1"># Filter rows AND pick only certain columns at once</span>
+<span class="n">market</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">market</span><span class="p">[</span><span class="s1">&#39;Cust_id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Cust_1818&#39;</span><span class="p">,</span>
+           <span class="p">[</span><span class="s1">&#39;Cust_id&#39;</span><span class="p">,</span> <span class="s1">&#39;Sales&#39;</span><span class="p">,</span> <span class="s1">&#39;Profit&#39;</span><span class="p">,</span> <span class="s1">&#39;Prod_id&#39;</span><span class="p">]]</span>
+</code></pre></div>
+
+<p>This filter-then-select pattern is one of the most frequently used patterns in daily analysis.</p>
+<hr />
+<h2 id="part-6-sorting-data"><span class="h-icon"><svg class="icon"><use href="#icon-sort"></use></svg></span>Part 6: Sorting Data</h2>
+<p>Sorting reorders your rows based on the values in one or more columns, using <code>sort_values</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">market</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Profit&#39;</span><span class="p">)</span>                   <span class="c1"># ascending (smallest first) — the default</span>
+<span class="n">market</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Profit&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># descending (largest first)</span>
+<span class="n">market</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;Profit&#39;</span><span class="p">,</span> <span class="s1">&#39;Sales&#39;</span><span class="p">])</span>        <span class="c1"># sort by Profit, break ties using Sales</span>
+</code></pre></div>
+
+<p>When you sort by two columns, Pandas sorts by the first, and uses the second only to break ties (which only matters when the first column has duplicate values):</p>
+<div class="diagram-card"><pre><code> sort_values([&#39;Profit&#39;, &#39;Sales&#39;])
+
+ Profit │ Sales         1. Sort by Profit first (ascending).
+   12   │  345          2. Where Profit values are EQUAL,
+   21   │  321             sort by Sales to break the tie.
+   21   │  876    ←──   ← same Profit=21, so Sales decides: 321 &lt; 876
+   65   │  765
+   89   │  773
+</code></pre></div>
+
+<p>In this example, two rows share <code>Profit = 21</code>. Pandas uses the Sales column to decide their order, placing the row with Sales 321 above the row with Sales 876.</p>
+<p>One useful parameter: <code>ignore_index=True</code> renumbers the index <code>0, 1, 2...</code> after sorting, keeping it tidy instead of preserving the scrambled original order:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">market</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Profit&#39;</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h2 id="part-7-combining-dataframes-merge-vs-concatenate"><span class="h-icon"><svg class="icon"><use href="#icon-merge"></use></svg></span>Part 7: Combining DataFrames — Merge vs Concatenate</h2>
+<p>Real data is usually spread across multiple files. Pandas gives you two ways to bring them together, and it's important to understand <em>which to use when</em>.</p>
+<div class="diagram-card"><pre><code>   MERGE                              CONCATENATE
+   Joins on a shared KEY column       Stacks tables directly
+   (like a VLOOKUP in Excel)          (top-bottom or side-by-side)
+</code></pre></div>
+
+<h3 id="merging-joining-on-a-common-column">Merging — Joining on a Common Column</h3>
+<p><strong>Merge</strong> combines tables by matching values in a shared "key" column. For example, our sales data has a <code>Cust_id</code>, and a separate customer table also has <code>Cust_id</code> — merge uses that to stitch each sale to its customer's details.</p>
+<blockquote><p>It's the same move as a VLOOKUP in Excel: you have a list of orders with a student ID on each row, and a separate roster with each student's name and class. Merge walks down the ID column and pulls in the matching name and class for every order, without you copy-pasting anything by hand.</p></blockquote>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">market</span>   <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;market_fact.csv&#39;</span><span class="p">)</span>   <span class="c1"># the sales transactions</span>
+<span class="n">customer</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;cust_dimen.csv&#39;</span><span class="p">)</span>     <span class="c1"># customer details</span>
+<span class="n">product</span>  <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;prod_dimen.csv&#39;</span><span class="p">)</span>     <span class="c1"># product details</span>
+
+<span class="n">new_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">market</span><span class="p">,</span> <span class="n">customer</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;Cust_id&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span>
+<span class="n">final_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">new_df</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;Prod_id&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Here's the idea visually — matching rows on the shared key:</p>
+<div class="diagram-card"><pre><code>   market table              customer table
+   ┌─────────┬───────┐       ┌─────────┬──────────┐
+   │ Cust_id │ Sales │       │ Cust_id │  Region  │
+   ├─────────┼───────┤       ├─────────┼──────────┤
+   │  C101   │  345  │       │  C101   │   West   │
+   │  C102   │  765  │       │  C102   │   East   │
+   └─────────┴───────┘       └─────────┴──────────┘
+                  │                 │
+                  └──── merge on ───┘
+                       &#39;Cust_id&#39;
+                          ▼
+            ┌─────────┬───────┬──────────┐
+            │ Cust_id │ Sales │  Region  │
+            ├─────────┼───────┼──────────┤
+            │  C101   │  345  │   West   │
+            │  C102   │  765  │   East   │
+            └─────────┴───────┴──────────┘
+</code></pre></div>
+
+<p>The <code>how='inner'</code> part controls which rows survive. An <strong>inner join</strong> keeps only rows that have a match in both tables. Other options exist (<code>left</code>, <code>right</code>, <code>outer</code>) but <code>inner</code> is the most common starting point.</p>
+<p>Once you've built a combined table, you can save it to a new CSV file:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">final_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;merged_data.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>   <span class="c1"># index=False skips the index column</span>
+</code></pre></div>
+
+<h3 id="concatenating-stacking-tables-directly">Concatenating — Stacking Tables Directly</h3>
+<p><strong>Concatenation</strong> doesn't match on a key — it just glues DataFrames together, either vertically or horizontally. The <code>axis</code> parameter controls the direction.</p>
+<p><strong><code>axis=0</code> — stack vertically (top and bottom).</strong> Use this when two tables have the <em>same columns</em> and you simply want to combine their rows:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df2</span><span class="p">,</span> <span class="n">df3</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   df2                    df3                 result (axis=0)
+   ┌─────┬────────┐       ┌─────┬────────┐    ┌─────┬────────┐
+   │ id  │ Profit │       │ id  │ Profit │    │ id  │ Profit │
+   ├─────┼────────┤   +   ├─────┼────────┤ =  ├─────┼────────┤
+   │ 101 │   65   │       │ 106 │   99   │    │ 101 │   65   │
+   │ 102 │   90   │       │ 107 │  105   │    │ 102 │   90   │
+   └─────┴────────┘       └─────┴────────┘    │ 106 │   99   │  ← df3
+                                              │ 107 │  105   │     stacked
+                                              └─────┴────────┘     below
+</code></pre></div>
+
+<p><strong><code>axis=1</code> — stack horizontally (side by side).</strong> Use this when tables describe the <em>same rows</em> but hold <em>different columns</em>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df2</span><span class="p">,</span> <span class="n">df4</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   df2                    df4              result (axis=1)
+   ┌─────┬────────┐       ┌────────┐       ┌─────┬────────┬────────┐
+   │ id  │ Profit │       │ Gender │       │ id  │ Profit │ Gender │
+   ├─────┼────────┤   +   ├────────┤  =    ├─────┼────────┼────────┤
+   │ 101 │   65   │       │   M    │       │ 101 │   65   │   M    │
+   │ 102 │   90   │       │   F    │       │ 102 │   90   │   F    │
+   └─────┴────────┘       └────────┘       └─────┴────────┴────────┘
+                                            └─ glued side by side ─┘
+</code></pre></div>
+
+<p><strong>The quick decision guide:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tables share a key column, want to link related info</td>
+<td><code>merge</code></td>
+</tr>
+<tr>
+<td>Same columns, want to add more rows</td>
+<td><code>concat(axis=0)</code></td>
+</tr>
+<tr>
+<td>Same rows, want to add more columns</td>
+<td><code>concat(axis=1)</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="part-8-grouping-and-summarizing-the-split-apply-combine-pattern"><span class="h-icon"><svg class="icon"><use href="#icon-groupby"></use></svg></span>Part 8: Grouping and Summarizing — The "Split-Apply-Combine" Pattern</h2>
+<p>This is one of the most powerful ideas in all of data analysis. Often you don't want a single grand total — you want a total <em>per category</em>. "What's the profit <em>per product category</em>?" "Average sales <em>per region</em>?" That's the job of <code>groupby</code>.</p>
+<h3 id="the-core-idea-visualized">The Core Idea, Visualized</h3>
+<p><code>groupby</code> follows a three-step pattern called <strong>split-apply-combine</strong>:</p>
+<blockquote><p>Picture sorting a mail bag into pigeonholes by zip code (<strong>split</strong>), weighing the mail in each pigeonhole (<strong>apply</strong>), then writing up a single sheet listing total weight per zip code (<strong>combine</strong>). You never manually track which letter belongs where — the pigeonholes do that for you.</p></blockquote>
+<div class="diagram-card"><pre><code>   1. SPLIT                2. APPLY              3. COMBINE
+   Break data into         Run a calculation    Stack the results
+   groups by category      on each group        into one summary
+
+   ┌──────────────┐
+   │ ALL DATA     │        Office → sum()       ┌──────────┬────────┐
+   │              │        = 12,300             │ Category │ Profit │
+   │ Office       │   →                    →    ├──────────┼────────┤
+   │ Tech         │        Tech   → sum()       │ Office   │ 12,300 │
+   │ Furniture    │        = 45,800             │ Tech     │ 45,800 │
+   │ (mixed up)   │                             │ Furniture│  8,100 │
+   └──────────────┘        Furn   → sum()       └──────────┴────────┘
+                           = 8,100
+</code></pre></div>
+
+<h3 id="doing-it-in-pandas">Doing It in Pandas</h3>
+<p>First, a simple grand total (no grouping):</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">merged_data</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>    <span class="c1"># total profit across everything</span>
+</code></pre></div>
+
+<p>Now, profit <em>by category</em>. We group on a <strong>categorical column</strong> (one with repeating text categories), then apply our calculation:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># How many unique categories are there?</span>
+<span class="n">merged_data</span><span class="p">[</span><span class="s1">&#39;Product_Category&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+<span class="c1"># [&#39;OFFICE SUPPLIES&#39;, &#39;TECHNOLOGY&#39;, &#39;FURNITURE&#39;]</span>
+
+<span class="c1"># How many rows in each?</span>
+<span class="n">merged_data</span><span class="p">[</span><span class="s1">&#39;Product_Category&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</code></pre></div>
+
+<p>When you group, the data is split into one chunk per category:</p>
+<div class="diagram-card"><pre><code>   merged_data splits into 3 groups:
+   ├── OFFICE SUPPLIES   → shape (4610, 16)
+   ├── TECHNOLOGY        → shape (2065, 16)
+   └── FURNITURE         → shape (1724, 16)
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">grp_by_cat</span> <span class="o">=</span> <span class="n">merged_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Product_Category&#39;</span><span class="p">)</span>
+
+<span class="n">grp_by_cat</span><span class="o">.</span><span class="n">groups</span>                       <span class="c1"># shows the row indices in each group</span>
+<span class="n">grp_by_cat</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="s1">&#39;TECHNOLOGY&#39;</span><span class="p">)</span>      <span class="c1"># pull out just one group as a DataFrame</span>
+</code></pre></div>
+
+<p>Now apply the summary — Pandas grabs the <code>Profit</code> column from each group and sums it separately:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">grp_by_cat</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</code></pre></div>
+
+<p>To present it cleanly, wrap it in a DataFrame and sort it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">grp_by_cat</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;Profit&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   Result:
+   ┌──────────────────┬─────────┐
+   │ Product_Category │  Profit │
+   ├──────────────────┼─────────┤
+   │ TECHNOLOGY       │  45,800 │  ← highest
+   │ OFFICE SUPPLIES  │  12,300 │
+   │ FURNITURE        │   8,100 │  ← lowest
+   └──────────────────┴─────────┘
+</code></pre></div>
+
+<h3 id="grouping-by-two-columns">Grouping by Two Columns</h3>
+<p>You can group by multiple categories at once for a finer breakdown — for instance, category <em>and</em> sub-category:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">grp_by_cat_subcat</span> <span class="o">=</span> <span class="n">merged_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Product_Category&#39;</span><span class="p">,</span> <span class="s1">&#39;Product_Sub_Category&#39;</span><span class="p">])</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">grp_by_cat_subcat</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+</code></pre></div>
+
+<p>This creates nested groups — each main category broken down into its sub-categories, each with its own profit total.</p>
+<hr />
+<h2 id="part-9-pivot-tables"><span class="h-icon"><svg class="icon"><use href="#icon-pivot"></use></svg></span>Part 9: Pivot Tables</h2>
+<p>If you've used Excel, <strong>pivot tables</strong> will feel familiar. They're an alternative to <code>groupby</code> that produces Excel-like aggregate tables, and they're especially good at summarizing across <em>two</em> dimensions at once.</p>
+<p>The method signature (called on a DataFrame):</p>
+<div class="diagram-card"><pre><code>df.pivot_table(values=..., index=..., columns=..., aggfunc=&#39;mean&#39;)
+</code></pre></div>
+
+<ul>
+<li><code>values</code> — the column you want to aggregate (e.g. <code>Profit</code>)</li>
+<li><code>index</code> — what goes down the rows</li>
+<li><code>columns</code> — what goes across the columns</li>
+<li><code>aggfunc</code> — the calculation to apply (<code>sum</code>, <code>mean</code>, <code>count</code>...)</li>
+</ul>
+<p>A simple one-dimensional pivot (similar to a groupby):</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">merged_data</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="s1">&#39;Profit&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s1">&#39;Customer_Segment&#39;</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The real power comes with a <strong>two-dimensional</strong> pivot — categories down the side, segments across the top:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">merged_data</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="s1">&#39;Profit&#39;</span><span class="p">,</span>
+                        <span class="n">index</span><span class="o">=</span><span class="s1">&#39;Product_Category&#39;</span><span class="p">,</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Customer_Segment&#39;</span><span class="p">,</span>
+                        <span class="n">aggfunc</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>                   ┌──────────── Customer_Segment ─────────────┐
+                   │ Consumer │ Corporate │ Home Office │ Small │
+   ┌───────────────┼──────────┼───────────┼─────────────┼───────┤
+   │ FURNITURE     │   2,100  │   3,400   │    1,200    │ 1,400 │
+   │ OFFICE SUPP.  │   4,500  │   5,100   │    1,800    │   900 │
+   │ TECHNOLOGY    │  18,200  │  15,600   │    7,300    │ 4,700 │
+   └───────────────┴──────────┴───────────┴─────────────┴───────┘
+       ▲                          ▲
+    index =                   columns =
+   Product_Category          Customer_Segment
+
+   Each cell = total Profit for that Category × Segment combination
+</code></pre></div>
+
+<p>This single table answers "which segment buys the most technology?" at a glance, the kind of summary that would take many separate groupby calls to reproduce.</p>
+<hr />
+<h2 id="part-10-applying-functions-with-apply-and-lambda"><span class="h-icon"><svg class="icon"><use href="#icon-series"></use></svg></span>Part 10: Applying Functions with <code>apply</code> and Lambda</h2>
+<p>Sometimes you need to transform a column using your own custom logic — creating a new column or altering an existing one. The <code>apply</code> method runs a function against every value in a column.</p>
+<blockquote><p>Think of <code>apply</code> as a rubber stamp: you press it on every single value in the column, one at a time, and it imprints whatever your function returns. A <strong>lambda</strong> is just a stamp you carve on the spot for a single job, instead of machining a permanent, reusable one with <code>def</code>.</p></blockquote>
+<h3 id="using-a-named-function">Using a Named Function</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">is_positive</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">num</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+<span class="n">merged_data</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">is_positive</span><span class="p">)</span>   <span class="c1"># True/False for each row</span>
+</code></pre></div>
+
+<p><code>apply</code> takes your function and runs it against every single value in the column, returning a new Series of results.</p>
+<h3 id="using-a-lambda-the-shortcut">Using a Lambda (the Shortcut)</h3>
+<p>For simple operations, writing a whole named function is overkill. A <strong>lambda</strong> is a tiny, one-line, anonymous function, perfect for use inside <code>apply</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># Exactly the same as the is_positive function above, in one line:</span>
+<span class="n">merged_data</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Lambdas can include conditional logic:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">merged_data</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;Profitable&#39;</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;Not Profitable&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<h3 id="creating-a-new-column">Creating a New Column</h3>
+<p>The most common real use: take the result of <code>apply</code> and store it as a brand-new column. Here we label every transaction as profitable or not:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">merged_data</span><span class="p">[</span><span class="s1">&#39;profitable_or_not&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged_data</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;Profitable&#39;</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;Not Profitable&#39;</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   BEFORE                          AFTER
+   ┌────────┐                      ┌────────┬───────────────────┐
+   │ Profit │                      │ Profit │ profitable_or_not │
+   ├────────┤                      ├────────┼───────────────────┤
+   │   52   │        apply         │   52   │ Profitable        │
+   │  -30   │   ───────────────►   │  -30   │ Not Profitable    │
+   │   18   │   (lambda creates    │   18   │ Profitable        │
+   │  -45   │    the new column)   │  -45   │ Not Profitable    │
+   └────────┘                      └────────┴───────────────────┘
+</code></pre></div>
+
+<p>This pattern, using <code>apply</code> with a lambda to engineer a new column, is one of the most frequent operations in real data preparation, especially when getting data ready for machine learning.</p>
+<hr />
+<h2 id="the-complete-pandas-workflow-at-a-glance"><span class="h-icon"><svg class="icon"><use href="#icon-workflow"></use></svg></span>The Complete Pandas Workflow at a Glance</h2>
+<p>Here's how all the pieces fit into a typical analysis, start to finish:</p>
+<div class="workflow-card">
+  <div class="wf-head">The Complete Pandas Workflow</div>
+  <div class="workflow-steps">
+    <div class="wf-step"><div class="wf-num">1</div><div class="wf-content"><strong>Load</strong><code>pd.read_csv()</code><br><span>Get data into a DataFrame from a file</span></div></div>
+    <div class="wf-step"><div class="wf-num">2</div><div class="wf-content"><strong>Explore</strong><code>.head()</code> <code>.info()</code> <code>.describe()</code><br><span>Understand the shape, types, and missing values</span></div></div>
+    <div class="wf-step"><div class="wf-num">3</div><div class="wf-content"><strong>Select</strong><code>.loc[]</code> <code>.iloc[]</code> <code>[columns]</code><br><span>Grab the exact rows and columns you need</span></div></div>
+    <div class="wf-step"><div class="wf-num">4</div><div class="wf-content"><strong>Filter</strong><code>df[df['col'] &gt; 0]</code><br><span>Keep only the rows that satisfy your condition</span></div></div>
+    <div class="wf-step"><div class="wf-num">5</div><div class="wf-content"><strong>Combine</strong><code>pd.merge()</code> <code>pd.concat()</code><br><span>Bring multiple datasets together</span></div></div>
+    <div class="wf-step"><div class="wf-num">6</div><div class="wf-content"><strong>Transform</strong><code>.apply(lambda ...)</code><br><span>Create or modify columns with custom logic</span></div></div>
+    <div class="wf-step"><div class="wf-num">7</div><div class="wf-content"><strong>Summarize</strong><code>.groupby()</code> <code>.pivot_table()</code><br><span>Aggregate data into meaningful insights</span></div></div>
+    <div class="wf-step"><div class="wf-num">8</div><div class="wf-content"><strong>Save</strong><code>.to_csv()</code><br><span>Export your results back to a file</span></div></div>
+  </div>
+</div>
+
+<hr />
+<h2 id="quick-reference-summary"><span class="h-icon"><svg class="icon"><use href="#icon-table"></use></svg></span>Quick Reference Summary</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Import Pandas</td>
+<td><code>import pandas as pd</code></td>
+</tr>
+<tr>
+<td>Read a CSV</td>
+<td><code>pd.read_csv('file.csv')</code></td>
+</tr>
+<tr>
+<td>First / last rows</td>
+<td><code>df.head()</code> / <code>df.tail()</code></td>
+</tr>
+<tr>
+<td>Shape (rows, cols)</td>
+<td><code>df.shape</code></td>
+</tr>
+<tr>
+<td>Column info &amp; nulls</td>
+<td><code>df.info()</code></td>
+</tr>
+<tr>
+<td>Statistical summary</td>
+<td><code>df.describe()</code></td>
+</tr>
+<tr>
+<td>Select one column</td>
+<td><code>df['col']</code></td>
+</tr>
+<tr>
+<td>Select many columns</td>
+<td><code>df[['col1', 'col2']]</code></td>
+</tr>
+<tr>
+<td>Select by position</td>
+<td><code>df.iloc[rows, cols]</code></td>
+</tr>
+<tr>
+<td>Select by label</td>
+<td><code>df.loc[rows, cols]</code></td>
+</tr>
+<tr>
+<td>Filter rows</td>
+<td><code>df[df['col'] &gt; 0]</code></td>
+</tr>
+<tr>
+<td>Combine filters</td>
+<td><code>df[(cond1) &amp; (cond2)]</code></td>
+</tr>
+<tr>
+<td>Sort</td>
+<td><code>df.sort_values('col', ascending=False)</code></td>
+</tr>
+<tr>
+<td>Set a new index</td>
+<td><code>df.set_index('col', inplace=True)</code></td>
+</tr>
+<tr>
+<td>Join on a key</td>
+<td><code>pd.merge(a, b, on='key', how='inner')</code></td>
+</tr>
+<tr>
+<td>Stack rows</td>
+<td><code>pd.concat([a, b], axis=0)</code></td>
+</tr>
+<tr>
+<td>Stack columns</td>
+<td><code>pd.concat([a, b], axis=1)</code></td>
+</tr>
+<tr>
+<td>Group &amp; summarize</td>
+<td><code>df.groupby('col')['target'].sum()</code></td>
+</tr>
+<tr>
+<td>Pivot table</td>
+<td><code>df.pivot_table(values=, index=, columns=, aggfunc=)</code></td>
+</tr>
+<tr>
+<td>Apply a function</td>
+<td><code>df['col'].apply(lambda x: ...)</code></td>
+</tr>
+<tr>
+<td>Save to CSV</td>
+<td><code>df.to_csv('out.csv', index=False)</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p>Pandas is the bridge between raw, messy data and real insight. Once these operations feel natural: loading, exploring, selecting, filtering, combining, grouping, and transforming, you'll be able to take almost any dataset and bend it to answer the questions you care about. The best way to internalize it is to grab a real CSV (your bank statement, a sports dataset, anything) and walk through the eight-step workflow above. Every diagram in this guide describes something you can now <em>do</em>, so open a notebook and try them on your own data.</p>
+
+      <div class="article-end">
+        <p><strong>Pandas is the bridge between raw, messy data and real insight.</strong> Once these operations feel natural, loading, exploring, selecting, filtering, combining, grouping, and transforming, you can take almost any dataset and shape it to answer the questions you care about. Grab a real CSV, your bank statement, a sports dataset, anything, and walk through the eight-step workflow above. Every diagram in this guide describes something you can now <em>do</em>.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="f-left">Python Data Science Series &nbsp;/&nbsp; Article 12 of the course</div>
+  <div class="f-right"><a href="#top">Back to top ↑</a></div>
+</footer>
+<script>
+(function(){
+  var t=document.getElementById('navToggle'),s=document.getElementById('sidebar');
+  if(t&&s){t.addEventListener('click',function(){s.classList.toggle('open');var o=s.classList.contains('open');t.innerHTML=o?'<svg class="icon"><use href="#icon-close"></use></svg>':'<svg class="icon"><use href="#icon-menu"></use></svg>';});s.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){s.classList.remove('open');t.innerHTML='<svg class="icon"><use href="#icon-menu"></use></svg>';});});}
+  var tl=Array.prototype.slice.call(document.querySelectorAll('.toc a')),sc=tl.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+  if('IntersectionObserver' in window&&sc.length){var bi={};tl.forEach(function(a){bi[a.getAttribute('href').slice(1)]=a;});var obs=new IntersectionObserver(function(es){es.forEach(function(e){var l=bi[e.target.id];if(!l)return;if(e.isIntersecting){tl.forEach(function(a){a.classList.remove('active');});l.classList.add('active');}});},{rootMargin:'-15% 0px -70% 0px',threshold:0});sc.forEach(function(s){obs.observe(s);});}
+  document.querySelectorAll('.code-card').forEach(function(c){var b=c.querySelector('.copy-btn'),e=c.querySelector('code');if(!b||!e)return;b.addEventListener('click',function(){var tx=e.innerText,done=function(){var o=b.innerHTML;b.innerHTML='<svg class="icon"><use href="#icon-check"></use></svg> Copied';setTimeout(function(){b.innerHTML=o;},1600);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(tx).then(done,done);else{var ta=document.createElement('textarea');ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(x){}document.body.removeChild(ta);done();}});});
+})();
+</script>
+</body>
+</html>

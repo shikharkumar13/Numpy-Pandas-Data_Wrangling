@@ -1,0 +1,1194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NumPy: The Complete Beginner's Guide to Numerical Python · Python Data Science Series</title>
+<meta name="description" content="A complete NumPy guide from the ground up: arrays, indexing, masking, broadcasting, file I/O and a full ride-sharing case study.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>:root{
+  --bg:#F0F3F8;--bg-grid:rgba(1,50,67,.05);--surface:#FFFFFF;--surface-soft:#F5F8FA;
+  --ink:#07151F;--ink-soft:#2E4A5A;--ink-faint:#7A98A8;
+  --navy:#013243;--navy-text:#01404F;
+  --blue:#4DA0FF;--blue-soft:rgba(77,160,255,.1);
+  --orange:#E07B00;--orange-text:#B86400;--orange-bg:rgba(250,141,0,.11);
+  --teal-text:#0B7A6E;--teal-soft:rgba(11,122,110,.1);
+  --line:#CFDAE0;--line-strong:#B0C4CE;
+  --code-bg:#001A24;--code-text:#D8E8EE;--code-line:#012030;
+  --radius-s:6px;--radius-m:10px;--radius-l:16px;
+  --shadow-card:0 1px 3px rgba(1,50,67,.06),0 8px 28px -12px rgba(1,50,67,.14);
+  --font-display:'Space Grotesk','Arial Narrow',sans-serif;
+  --font-body:'IBM Plex Sans',-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:linear-gradient(var(--bg-grid) 1px,transparent 1px) 0 0/28px 28px,linear-gradient(90deg,var(--bg-grid) 1px,transparent 1px) 0 0/28px 28px,var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased;}
+a{color:var(--navy-text);text-decoration-color:rgba(1,50,67,.3);text-underline-offset:2px;}
+a:hover{text-decoration-color:currentColor;}
+::selection{background:var(--navy);color:#fff;}
+:focus-visible{outline:2.5px solid var(--blue);outline-offset:2px;border-radius:3px;}
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.15em;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+
+.shell{max-width:1300px;margin:0 auto;padding:0 clamp(16px,4vw,44px);}
+.topbar{display:none;position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;padding:12px clamp(16px,4vw,44px);background:rgba(240,243,248,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+.topbar .brand{font-family:var(--font-display);font-weight:700;font-size:.93rem;}
+.topbar .brand span{color:var(--orange);}
+.topbar button{border:1.5px solid var(--line-strong);background:var(--surface);border-radius:var(--radius-s);width:38px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);}
+
+.hero{padding:clamp(48px,7vw,88px) 0 clamp(32px,5vw,52px);}
+.hero-eyebrow{font-family:var(--font-mono);font-size:.77rem;letter-spacing:.14em;text-transform:uppercase;color:var(--orange-text);font-weight:500;display:flex;align-items:center;gap:.6em;margin-bottom:18px;}
+.hero-eyebrow::before{content:"";width:26px;height:2px;background:var(--orange);display:inline-block;}
+h1.title{font-family:var(--font-display);font-weight:700;font-size:clamp(2rem,4.2vw,3.3rem);line-height:1.08;letter-spacing:-.02em;margin:0 0 18px;max-width:22ch;}
+h1.title em{font-style:normal;color:var(--orange-text);}
+.hero-sub{font-size:clamp(1rem,1.55vw,1.16rem);color:var(--ink-soft);max-width:65ch;margin:0 0 30px;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:9px;}
+.chip{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);padding:8px 14px 8px 10px;border-radius:999px;font-family:var(--font-mono);font-size:.76rem;color:var(--ink-soft);box-shadow:var(--shadow-card);}
+.chip .icon{width:1.1em;height:1.1em;}
+.chip:nth-child(1) .icon{color:var(--orange);}
+.chip:nth-child(2) .icon{color:var(--blue);}
+.chip:nth-child(3) .icon{color:var(--teal-text);}
+.chip:nth-child(4) .icon{color:var(--orange);}
+.chip:nth-child(5) .icon{color:var(--blue);}
+
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:clamp(24px,4vw,52px);align-items:start;padding-bottom:100px;}
+.sidebar{position:sticky;top:28px;max-height:calc(100vh - 56px);overflow-y:auto;padding-right:6px;}
+.sidebar::-webkit-scrollbar{width:5px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px;}
+.toc-label{font-family:var(--font-mono);font-size:.71rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin:4px 0 10px;padding-left:14px;}
+.toc{list-style:none;margin:0 0 16px;padding:0;border-left:1.5px solid var(--line);}
+.toc li{margin:0;}
+.toc a{display:flex;align-items:center;gap:9px;padding:6px 14px;margin-left:-1.5px;padding-left:12.5px;border-left:1.5px solid transparent;font-size:.83rem;color:var(--ink-soft);text-decoration:none;transition:color .14s,border-color .14s,background .14s;border-radius:0 var(--radius-s) var(--radius-s) 0;}
+.toc a .icon{width:1em;height:1em;flex:none;color:var(--ink-faint);transition:color .14s;}
+.toc a:hover{color:var(--ink);background:var(--surface-soft);}
+.toc a.active{color:var(--navy-text);border-left-color:var(--orange);background:var(--orange-bg);font-weight:500;}
+.toc a.active .icon{color:var(--orange);}
+.toc .toc-group{font-family:var(--font-mono);font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);padding:12px 14px 4px;}
+
+.article{min-width:0;padding-top:10px;}
+.article h2{font-family:var(--font-display);font-weight:600;font-size:clamp(1.45rem,2.5vw,1.85rem);letter-spacing:-.01em;margin:60px 0 16px;padding-top:8px;scroll-margin-top:22px;display:flex;align-items:center;gap:12px;}
+.article>h2:first-of-type{margin-top:6px;}
+.article h2 .h-icon{width:1.4rem;height:1.4rem;flex:none;color:var(--orange);}
+.article h2 .h-icon .icon{width:100%;height:100%;}
+.article h3{font-family:var(--font-display);font-weight:600;font-size:1.08rem;margin:28px 0 10px;scroll-margin-top:22px;}
+.article p{margin:0 0 16px;}
+.article ul,.article ol{margin:0 0 18px;padding-left:1.3em;}
+.article li{margin-bottom:7px;}
+.article li::marker{color:var(--orange);}
+.article strong{font-weight:600;}
+.article hr{border:none;border-top:1px solid var(--line);margin:44px 0;}
+.article code{font-family:var(--font-mono);font-size:.85em;background:var(--surface-soft);border:1px solid var(--line);padding:.1em .36em;border-radius:4px;color:var(--orange-text);}
+.article blockquote{margin:20px 0;padding:12px 16px;border-left:3px solid var(--blue);background:var(--blue-soft);border-radius:0 var(--radius-s) var(--radius-s) 0;color:var(--ink-soft);}
+.article blockquote p{margin:0;color:inherit;}
+
+.table-wrap{overflow-x:auto;margin:20px 0 26px;border-radius:var(--radius-m);box-shadow:var(--shadow-card);}
+.article table{width:100%;border-collapse:collapse;background:var(--surface);font-size:.88rem;}
+.article thead th{background:var(--navy);color:#fff;font-family:var(--font-display);font-weight:600;text-align:left;padding:11px 15px;white-space:nowrap;font-size:.8rem;letter-spacing:.01em;}
+.article tbody td{padding:10px 15px;border-bottom:1px solid var(--line);vertical-align:top;}
+.article tbody tr:last-child td{border-bottom:none;}
+.article tbody tr:nth-child(even){background:var(--surface-soft);}
+.article tbody td code{white-space:nowrap;}
+
+.code-card{margin:20px 0 24px;border-radius:var(--radius-m);overflow:hidden;background:var(--code-bg);box-shadow:var(--shadow-card);}
+.code-card .code-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#001520;border-bottom:1px solid var(--code-line);}
+.code-card .dots{display:flex;gap:5px;}
+.code-card .dots span{width:8px;height:8px;border-radius:50%;display:block;}
+.code-card .dots span:nth-child(1){background:#E8664A;}
+.code-card .dots span:nth-child(2){background:#E3B23C;}
+.code-card .dots span:nth-child(3){background:#3CB371;}
+.code-card .lang{font-family:var(--font-mono);font-size:.7rem;color:#5A7A88;letter-spacing:.06em;}
+.code-card .copy-btn{font-family:var(--font-mono);font-size:.7rem;color:#7A9AAA;background:transparent;border:1px solid #1A3A4A;border-radius:5px;padding:3px 9px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .14s;}
+.code-card .copy-btn:hover{background:#0A2535;color:#fff;border-color:#2A5A70;}
+.code-card .copy-btn .icon{width:.9em;height:.9em;}
+.code-card pre{margin:0;padding:14px 18px;overflow-x:auto;}
+.code-card code{font-family:var(--font-mono);font-size:.855rem;line-height:1.6;color:var(--code-text);background:none;border:none;padding:0;}
+
+.code-card .k,.code-card .kn,.code-card .kd{color:#7EBDE0;}
+.code-card .nb{color:#7EBDE0;}
+.code-card .nf,.code-card .fm{color:#63C4A8;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa{color:#C8D96A;}
+.code-card .mi,.code-card .mf{color:#F5A34A;}
+.code-card .o,.code-card .p{color:#5A7A88;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#3A5A68;font-style:italic;}
+.code-card .n{color:var(--code-text);}
+.code-card .nc{color:#F0C060;}
+
+.diagram-card{margin:20px 0 24px;border-radius:var(--radius-m);overflow:hidden;position:relative;border:1.5px dashed var(--line-strong);background:linear-gradient(var(--bg-grid) 1px,transparent 1px) 0 0/18px 18px,linear-gradient(90deg,var(--bg-grid) 1px,transparent 1px) 0 0/18px 18px,var(--surface-soft);}
+.diagram-card::before{content:"diagram";position:absolute;top:9px;right:12px;font-family:var(--font-mono);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);}
+.diagram-card pre{margin:0;padding:24px 20px 18px;overflow-x:auto;}
+.diagram-card code{font-family:var(--font-mono);font-size:.8rem;line-height:1.5;color:var(--ink-soft);background:none;border:none;padding:0;white-space:pre;}
+
+.article-end{margin-top:52px;padding:26px 24px;border-radius:var(--radius-m);background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow-card);}
+.article-end p{margin:0;font-size:1rem;color:var(--ink-soft);}
+.article-end p strong{color:var(--ink);}
+
+footer.site-footer{border-top:1px solid var(--line);margin-top:36px;padding:22px clamp(16px,4vw,44px) 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer.site-footer .f-left{font-family:var(--font-mono);font-size:.76rem;color:var(--ink-faint);}
+footer.site-footer a{font-size:.8rem;color:var(--ink-soft);}
+
+@media(max-width:960px){
+  .topbar{display:flex;}
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:fixed;inset:57px 0 0 0;z-index:35;background:var(--bg);padding:16px clamp(16px,4vw,44px) 24px;transform:translateX(-100%);transition:transform .2s;max-height:none;height:calc(100vh - 57px);}
+  .sidebar.open{transform:translateX(0);}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true"><defs>
+<symbol id="icon-why" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".9" fill="currentColor" stroke="none"/></symbol>
+<symbol id="icon-engine" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="8" rx="2"/><line x1="8" y1="8" x2="8" y2="5"/><line x1="12" y1="8" x2="12" y2="5"/><line x1="16" y1="8" x2="16" y2="5"/><line x1="8" y1="16" x2="8" y2="19"/><line x1="12" y1="16" x2="12" y2="19"/><line x1="16" y1="16" x2="16" y2="19"/><rect x="2" y="10" width="2" height="4" rx=".5"/><rect x="20" y="10" width="2" height="4" rx=".5"/></symbol>
+<symbol id="icon-array" viewBox="0 0 24 24"><rect x="2" y="5" width="5" height="5" rx="1"/><rect x="9.5" y="5" width="5" height="5" rx="1"/><rect x="17" y="5" width="5" height="5" rx="1"/><rect x="2" y="14" width="5" height="5" rx="1"/><rect x="9.5" y="14" width="5" height="5" rx="1"/><rect x="17" y="14" width="5" height="5" rx="1"/></symbol>
+<symbol id="icon-index" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="1.5"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="8" y1="4" x2="8" y2="20"/><line x1="15" y1="4" x2="15" y2="20"/><circle cx="5" cy="15" r="1.2" fill="currentColor" stroke="none"/></symbol>
+<symbol id="icon-mask" viewBox="0 0 24 24"><rect x="1.5" y="5" width="21" height="5" rx="1" opacity=".35" fill="currentColor" stroke="none"/><rect x="1.5" y="14" width="21" height="5" rx="1" fill="currentColor" stroke="none"/><line x1="1.5" y1="12" x2="22.5" y2="12" stroke-dasharray="3 2"/></symbol>
+<symbol id="icon-math" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="12" y1="3" x2="12" y2="21"/><circle cx="6" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="18" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="6" cy="18" r="1.3" fill="currentColor" stroke="none"/><circle cx="18" cy="18" r="1.3" fill="currentColor" stroke="none"/></symbol>
+<symbol id="icon-aggregate" viewBox="0 0 24 24"><rect x="2" y="4" width="4" height="16" rx="1"/><rect x="8" y="8" width="4" height="12" rx="1"/><rect x="14" y="6" width="4" height="14" rx="1"/><rect x="20" y="2" width="4" height="18" rx="1" opacity=".4" fill="currentColor" stroke="none"/><path d="M 2 21 L 6 21"/></symbol>
+<symbol id="icon-sort" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="11" x2="16" y2="11"/><line x1="3" y1="16" x2="10" y2="16"/><polyline points="18,13 21,16 18,19"/></symbol>
+<symbol id="icon-stack" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="6" rx="1.2"/><rect x="2" y="10" width="20" height="6" rx="1.2" opacity=".6" fill="currentColor" stroke="none"/><rect x="2" y="18" width="20" height="4" rx="1.2" opacity=".3" fill="currentColor" stroke="none"/></symbol>
+<symbol id="icon-inspect" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7.5"/><line x1="16.5" y1="16.5" x2="21" y2="21"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="11" y1="8" x2="11" y2="14"/></symbol>
+<symbol id="icon-reshape" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="1.2"/><rect x="2" y="14" width="9" height="8" rx="1.2"/><rect x="13" y="14" width="9" height="8" rx="1.2"/><path d="M 12 10 L 12 14" stroke-dasharray="2 1.5"/></symbol>
+<symbol id="icon-copy" viewBox="0 0 24 24"><rect x="2" y="4" width="11" height="11" rx="1.5"/><line x1="13" y1="4" x2="19" y2="4"/><line x1="19" y1="4" x2="19" y2="16"/><line x1="13" y1="16" x2="19" y2="16"/><polyline points="7,15 2,20 7,20" opacity=".5"/></symbol>
+<symbol id="icon-broadcast" viewBox="0 0 24 24"><rect x="8" y="9" width="8" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1" opacity=".7" fill="currentColor" stroke="none"/><path d="M 12 13 L 12 17" stroke-dasharray="2 1.5"/><path d="M 6 17 L 8 13" stroke-dasharray="2 1.5"/><path d="M 18 17 L 16 13" stroke-dasharray="2 1.5"/></symbol>
+<symbol id="icon-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></symbol>
+<symbol id="icon-case" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="1.5"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></symbol>
+<symbol id="icon-table" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15.5" y1="3" x2="15.5" y2="21"/></symbol>
+<symbol id="icon-copy-btn" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="1.6"/><path d="M5 16H4.5A1.5 1.5 0 0 1 3 14.5v-10A1.5 1.5 0 0 1 4.5 3h10A1.5 1.5 0 0 1 16 4.5V5"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12.5 L9.5 18 L20 5"/></symbol>
+<symbol id="icon-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+<symbol id="icon-close" viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></symbol>
+</defs></svg>
+<script>
+(function(){
+  var toggle=document.getElementById('navToggle'),sidebar=document.getElementById('sidebar');
+  if(toggle&&sidebar){
+    toggle.addEventListener('click',function(){
+      sidebar.classList.toggle('open');
+      var open=sidebar.classList.contains('open');
+      toggle.innerHTML=open?'<svg class="icon"><use href="#icon-close"></use></svg>':'<svg class="icon"><use href="#icon-menu"></use></svg>';
+    });
+    sidebar.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){sidebar.classList.remove('open');toggle.innerHTML='<svg class="icon"><use href="#icon-menu"></use></svg>';});});
+  }
+  var tocLinks=Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var sections=tocLinks.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+  if('IntersectionObserver' in window&&sections.length){
+    var byId={};
+    tocLinks.forEach(function(a){byId[a.getAttribute('href').slice(1)]=a;});
+    var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){var l=byId[e.target.id];if(!l)return;if(e.isIntersecting){tocLinks.forEach(function(a){a.classList.remove('active');});l.classList.add('active');}});},{rootMargin:'-15% 0px -70% 0px',threshold:0});
+    sections.forEach(function(s){obs.observe(s);});
+  }
+  document.querySelectorAll('.code-card').forEach(function(card){
+    var btn=card.querySelector('.copy-btn'),codeEl=card.querySelector('code');
+    if(!btn||!codeEl)return;
+    btn.addEventListener('click',function(){
+      var text=codeEl.innerText,done=function(){var o=btn.innerHTML;btn.innerHTML='<svg class="icon"><use href="#icon-check"></use></svg> Copied';setTimeout(function(){btn.innerHTML=o;},1600);};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(done,done);
+      else{var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);done();}
+    });
+  });
+})();
+</script>
+
+
+<div class="topbar">
+  <span class="brand">§12 &nbsp;<span>NumPy</span></span>
+  <button id="navToggle" aria-label="Toggle navigation">
+    <svg class="icon"><use href="#icon-menu"></use></svg>
+  </button>
+</div>
+
+<div class="shell">
+  <section class="hero">
+    <div class="hero-eyebrow">Python Data Science Series &nbsp;·&nbsp; Article 12</div>
+    <h1 class="title">NumPy: The Complete Beginner's Guide to <em>Numerical Python</em></h1>
+    <p class="hero-sub">If Pandas is the workhorse of data analysis, <strong>NumPy is the engine sitting underneath it.</strong> NumPy (short for <em>Numerical Python</em>) is the foundational library for numerical computing in Python , which lets you do fast math on huge collections of numbers, and almost every other data science tool (Pandas, scikit-learn, TensorFlow) is built on top of it.</p>
+    <div class="hero-chips">
+      <div class="chip"><svg class="icon"><use href="#icon-engine"></use></svg> Why NumPy is 50× faster</div>
+      <div class="chip"><svg class="icon"><use href="#icon-mask"></use></svg> Masking &amp; Boolean indexing</div>
+      <div class="chip"><svg class="icon"><use href="#icon-broadcast"></use></svg> Broadcasting explained visually</div>
+      <div class="chip"><svg class="icon"><use href="#icon-copy"></use></svg> Views vs copies demystified</div>
+      <div class="chip"><svg class="icon"><use href="#icon-case"></use></svg> Full ride-sharing case study</div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="toc-label">15 parts</div>
+      <ul class="toc">
+        <li><a href="#part-1-why-numpy-exists"><svg class="icon"><use href="#icon-why"></use></svg><span>Part 1: Why NumPy Exists</span></a></li>
+<li><a href="#part-2-how-numpy-works-under-the-hood"><svg class="icon"><use href="#icon-engine"></use></svg><span>Part 2: How NumPy Works Under the Hood</span></a></li>
+<li><a href="#part-3-creating-arrays"><svg class="icon"><use href="#icon-array"></use></svg><span>Part 3: Creating Arrays</span></a></li>
+<li><a href="#part-4-indexing-and-slicing"><svg class="icon"><use href="#icon-index"></use></svg><span>Part 4: Indexing and Slicing</span></a></li>
+<li><a href="#part-5-masking-boolean-fancy-indexing"><svg class="icon"><use href="#icon-mask"></use></svg><span>Part 5: Masking (Boolean / Fancy Indexing)</span></a></li>
+<li><a href="#part-6-universal-functions-math-on-whole-arrays"><svg class="icon"><use href="#icon-math"></use></svg><span>Part 6: Universal Functions (Math on Whole Arrays)</span></a></li>
+<li><a href="#part-7-aggregation-and-the-all-important-axis"><svg class="icon"><use href="#icon-aggregate"></use></svg><span>Part 7: Aggregation: and the All-Important axis</span></a></li>
+<li><a href="#part-8-sorting"><svg class="icon"><use href="#icon-sort"></use></svg><span>Part 8: Sorting</span></a></li>
+<li><a href="#part-9-combining-and-splitting-arrays"><svg class="icon"><use href="#icon-stack"></use></svg><span>Part 9: Combining and Splitting Arrays</span></a></li>
+<li><a href="#part-10-inspecting-an-array"><svg class="icon"><use href="#icon-why"></use></svg><span>Part 10: Inspecting an Array</span></a></li>
+<li><a href="#part-11-reshaping-changing-the-form-without-changing-the-data"><svg class="icon"><use href="#icon-why"></use></svg><span>Part 11: Reshaping: Changing the Form Without Changing the Data</span></a></li>
+<li><a href="#part-12-shallow-vs-deep-copy-shared-memory"><svg class="icon"><use href="#icon-why"></use></svg><span>Part 12: Shallow vs Deep Copy (Shared Memory)</span></a></li>
+<li><a href="#part-13-broadcasting-math-between-different-shaped-arrays"><svg class="icon"><use href="#icon-why"></use></svg><span>Part 13: Broadcasting: Math Between Different-Shaped Arrays</span></a></li>
+<li><a href="#part-14-getting-data-in-and-out-of-files"><svg class="icon"><use href="#icon-why"></use></svg><span>Part 14: Getting Data In and Out of Files</span></a></li>
+<li><a href="#part-15-putting-it-all-together-a-real-case-study"><svg class="icon"><use href="#icon-why"></use></svg><span>Part 15: Putting It All Together: A Real Case Study</span></a></li>
+<li><a href="#quick-reference-summary"><svg class="icon"><use href="#icon-table"></use></svg><span>Quick Reference Summary</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="article">
+      <p>This guide combines everything from the ground up: what NumPy is and <em>why</em> it's so fast, how to create and manipulate arrays, all the mathematical and statistical operations, how to read and write real data files, and finally a full real-world case study analyzing ride-sharing data the way a working data scientist would. Throughout, you'll find <strong>visual diagrams</strong> so you can actually <em>see</em> what's happening to the numbers, no plotting code, just pictures made of text.</p>
+<hr />
+<h2 id="part-1-why-numpy-exists"><span class="h-icon"><svg class="icon"><use href="#icon-why"></use></svg></span>Part 1: Why NumPy Exists</h2>
+<p>Before any syntax, it helps to understand the problem NumPy solves. Python lists are flexible, but slow for math. NumPy arrays are the opposite: a little stricter, but blazingly fast.</p>
+<h3 id="the-core-advantages">The Core Advantages</h3>
+<p>NumPy gives us four big wins: <strong>memory efficiency</strong>, <strong>speed</strong>, a huge library of <strong>ready-made functions</strong>, and <strong>ease of use</strong>. The speed comes from the fact that NumPy is written in the <strong>C language</strong> under the hood.</p>
+<p>To use it, we import it with its near-universal nickname <code>np</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</code></pre></div>
+
+<h3 id="the-square-every-number-problem">The "Square Every Number" Problem</h3>
+<p>Suppose you have a list of numbers and want to square each one. With a plain Python list, this doesn't work the way you'd hope:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">list1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">87</span><span class="p">,</span> <span class="mi">99</span><span class="p">]</span>
+<span class="n">list1</span> <span class="o">**</span> <span class="mi">2</span>     <span class="c1"># ERROR — you can&#39;t square a whole list at once</span>
+</code></pre></div>
+
+<p>You'd have to write a loop:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">twice</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">list1</span><span class="p">:</span>
+    <span class="n">twice</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+
+<p>But with NumPy, you just... square the array. This is called <strong>element-wise operation</strong>, and it's the single biggest day-to-day convenience NumPy offers:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">arr1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">list1</span><span class="p">)</span>   <span class="c1"># convert the list into a NumPy array</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">arr1</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>         <span class="c1"># squares every element at once — clean and simple</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   Python list (manual loop)          NumPy array (element-wise)
+
+   [10, 20, 30, 45]                   [10, 20, 30, 45]
+     │   │   │   │                       │   │   │   │
+   loop loop loop loop                  (all at once)
+     ↓   ↓   ↓   ↓                       ↓   ↓   ↓   ↓
+   [100,400,900,2025]                  [100,400,900,2025]
+</code></pre></div>
+
+<h3 id="the-speed-advantage">The Speed Advantage</h3>
+<p>The real story is speed. Using the <code>%timeit</code> tool to measure performance on a million numbers tells the tale:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">l</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000000</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="p">[</span><span class="n">i</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span><span class="p">]</span>        <span class="c1"># Python list: ~25.3 milliseconds per loop</span>
+
+<span class="n">l_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1000000</span><span class="p">))</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">l_arr</span><span class="o">**</span><span class="mi">2</span>                 <span class="c1"># NumPy array: ~485 microseconds per loop</span>
+</code></pre></div>
+
+<p>That's roughly <strong>50x faster</strong>. Why such a dramatic difference?</p>
+<ul>
+<li>NumPy arrays are <strong>densely packed in memory</strong> because every element is the same type.</li>
+<li>NumPy uses <strong>SIMD instructions</strong> (Single Instruction, Multiple Data). One CPU instruction that operates on several numbers at once, like running four additions in the time it takes Python to run one.</li>
+<li>The core operations are <strong>implemented in C</strong>, which runs far faster than interpreted Python.</li>
+</ul>
+<hr />
+<h2 id="part-2-how-numpy-works-under-the-hood"><span class="h-icon"><svg class="icon"><use href="#icon-engine"></use></svg></span>Part 2: How NumPy Works Under the Hood</h2>
+<p>This is the most important concept for <em>understanding</em> NumPy rather than just using it. The key question: why is a NumPy array so much faster than a Python list?</p>
+<h3 id="the-analogy-a-scattered-library-vs-a-packed-bookshelf">The Analogy: A Scattered Library vs. a Packed Bookshelf</h3>
+<p>In a <strong>Python list</strong>, you can mix types: integers, strings, floats, all together. But there's a hidden cost. The actual values live scattered all over your computer's memory (RAM). The list itself only holds <strong>references</strong> (think of them as addresses, R1, R2, R3...) pointing to where each value really lives.</p>
+<p>So reading one number is a <strong>two-step trip</strong>: the computer looks at the list to find the address, then travels to that address in RAM to fetch the actual value.</p>
+<p>A <strong>C array</strong> (which is what NumPy actually is) stores all the values of the same type <strong>packed together in one continuous block of memory</strong>. Reading a value is a <strong>single step</strong>. You go straight to it by its position.</p>
+<div class="diagram-card"><pre><code>   PYTHON LIST  (references scattered in memory)
+
+   list ──► [ R1 ][ R2 ][ R3 ][ R4 ]
+              │     │     │     │
+              ▼     ▼     ▼     ▼
+            (10)  (20)  (30)  (40)      ← values scattered everywhere
+            two steps to read each value
+
+
+   NUMPY ARRAY  (values packed together — a C array)
+
+   array ──► [ 10 ][ 20 ][ 30 ][ 40 ]   ← all values side by side
+             one step to read each value
+</code></pre></div>
+
+<p>The trade-off: because everything is packed together by type, a NumPy array <strong>can only hold one data type</strong> (all integers, or all floats). It loses the flexibility of a Python list, but gains enormous speed. In short: <strong>NumPy arrays are not really Python lists. They are C arrays wearing a Python costume.</strong></p>
+<hr />
+<h2 id="part-3-creating-arrays"><span class="h-icon"><svg class="icon"><use href="#icon-array"></use></svg></span>Part 3: Creating Arrays</h2>
+<h3 id="from-a-list-and-the-three-dimensions">From a List, and the Three "Dimensions"</h3>
+<p>The simplest way to make an array is from a list. And lists-within-lists make higher dimensions:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">])</span>                       <span class="c1"># 1D array</span>
+<span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span> <span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">70</span><span class="p">]])</span>     <span class="c1"># 2D array</span>
+</code></pre></div>
+
+<p>NumPy has special names for arrays of different dimensions, borrowed from math:</p>
+<div class="diagram-card"><pre><code>   1D = VECTOR          2D = MATRIX            3D+ = TENSOR
+   (a single row)       (rows &amp; columns)       (a stack of matrices)
+
+   [10 20 30]           [[10 20]                  ┌─────────┐
+                         [30 40]                 ┌─────────┐│
+                         [60 70]]                │ [[..]]  ││
+                                                 │ [[..]]  │┘
+                                                 └─────────┘
+</code></pre></div>
+
+<h3 id="building-sequences-with-arange">Building Sequences with <code>arange()</code></h3>
+<p><code>np.arange()</code> is NumPy's version of Python's <code>range()</code> , which builds a sequence from a start to an end, stepping by some amount. The format is <code>arange(start, end, step)</code>, and importantly, <strong>the end value is not included</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>         <span class="c1"># [1 2 3 4]      — stops before 5</span>
+<span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>      <span class="c1"># [1 3]          — step of 2</span>
+<span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>    <span class="c1"># [1. 1.5 2. ... 4.5]  — float steps allowed!</span>
+</code></pre></div>
+
+<p>Unlike Python's <code>range()</code>, <code>np.arange()</code> happily accepts a <strong>floating-point step size</strong>, which is genuinely useful.</p>
+<h3 id="ready-made-array-builders">Ready-Made Array Builders</h3>
+<p>You'll often want an array pre-filled with a particular pattern. NumPy has a builder for each common case:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it builds</th>
+<th>Mental picture</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>np.ones((2,3))</code></td>
+<td>All ones</td>
+<td>a grid full of 1s</td>
+</tr>
+<tr>
+<td><code>np.zeros((2,3))</code></td>
+<td>All zeros</td>
+<td>a blank grid</td>
+</tr>
+<tr>
+<td><code>np.full((2,3), 7)</code></td>
+<td>All the same value</td>
+<td>a grid full of 7s</td>
+</tr>
+<tr>
+<td><code>np.identity(3)</code></td>
+<td>Identity matrix</td>
+<td>1s on the diagonal, 0s elsewhere</td>
+</tr>
+<tr>
+<td><code>np.eye(3)</code></td>
+<td>Like identity (more flexible)</td>
+<td>1s on a diagonal</td>
+</tr>
+<tr>
+<td><code>np.diag([1,2,3])</code></td>
+<td>Values on the diagonal</td>
+<td>your numbers down the diagonal</td>
+</tr>
+<tr>
+<td><code>np.random.random((2,2))</code></td>
+<td>Random floats 0–1</td>
+<td>a grid of random decimals</td>
+</tr>
+<tr>
+<td><code>np.random.randint(10,51,size=15)</code></td>
+<td>Random integers in a range</td>
+<td>random whole numbers</td>
+</tr>
+</tbody>
+</table></div>
+<p>The identity matrix is worth picturing, since it shows up constantly in math:</p>
+<div class="diagram-card"><pre><code>   np.identity(3)
+   ┌           ┐
+   │ 1   0   0 │
+   │ 0   1   0 │   ← 1s run down the diagonal, 0s everywhere else
+   │ 0   0   1 │
+   └           ┘
+</code></pre></div>
+
+<hr />
+<h2 id="part-4-indexing-and-slicing"><span class="h-icon"><svg class="icon"><use href="#icon-index"></use></svg></span>Part 4: Indexing and Slicing</h2>
+<p>Once you have an array, you need to grab pieces of it. Let's use a random array of 15 numbers:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">mat1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div>
+
+<h3 id="basic-access">Basic Access</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">mat1</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>          <span class="c1"># the element at position 5</span>
+<span class="n">mat1</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span>         <span class="c1"># ERROR — index out of bounds (there&#39;s no position 16)</span>
+<span class="n">mat1</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>       <span class="c1"># positions 3 through 9</span>
+<span class="n">mat1</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">11</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>     <span class="c1"># positions 2 to 10, stepping by 2</span>
+<span class="n">mat1</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>       <span class="c1"># the whole array, reversed</span>
+<span class="n">mat1</span><span class="p">[[</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">7</span><span class="p">]]</span>  <span class="c1"># fancy indexing — grab specific positions in any order</span>
+</code></pre></div>
+
+<h3 id="negative-indexing">Negative Indexing</h3>
+<p>NumPy lets you count from the <em>end</em> using negative numbers. <code>-1</code> is the last element:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">mat1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>         <span class="c1"># last element</span>
+<span class="n">mat1</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>      <span class="c1"># from 5th-from-end up to (not including) last</span>
+<span class="n">mat1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">5</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>   <span class="c1"># last four elements, in reverse</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   Positive index:    0    1    2    3    4
+   Array:           [ 42   17   33   25   48 ]
+   Negative index:   -5   -4   -3   -2   -1
+                      ▲                    ▲
+                   first              mat1[-1] = 48
+</code></pre></div>
+
+<hr />
+<h2 id="part-5-masking-boolean-fancy-indexing"><span class="h-icon"><svg class="icon"><use href="#icon-mask"></use></svg></span>Part 5: Masking (Boolean / Fancy Indexing)</h2>
+<p>This is one of NumPy's superpowers and a concept you'll use every single day in data analysis: filtering an array by a <strong>condition</strong>.</p>
+<p>When you write a comparison against an array, NumPy returns an array of <code>True</code>/<code>False</code> values. One per element, a <strong>boolean mask</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">mat1</span> <span class="o">&gt;</span> <span class="mi">25</span>       <span class="c1"># [True, False, True, True, ...]   (a mask)</span>
+</code></pre></div>
+
+<p>Think of the mask as a stencil laid over your data. Where the stencil says <code>True</code>, the value shows through; where it says <code>False</code>, it's filtered out:</p>
+<div class="diagram-card"><pre><code>   data:   [ 42   17   33   25   48   12 ]
+   mask:   [  T    F    T    F    T    F ]   ← (data &gt; 25)
+            ───────────────────────────
+   result: [ 42        33        48     ]   ← only the True values kept
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">mat1</span><span class="p">[</span><span class="n">mat1</span> <span class="o">&gt;</span> <span class="mi">25</span><span class="p">]</span>                       <span class="c1"># keeps only values greater than 25</span>
+<span class="n">mat1</span><span class="p">[(</span><span class="n">mat1</span> <span class="o">&gt;</span> <span class="mi">25</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">mat1</span> <span class="o">&lt;</span> <span class="mi">45</span><span class="p">)]</span>       <span class="c1"># combine conditions with &amp;</span>
+</code></pre></div>
+
+<p>When combining conditions, use <code>&amp;</code> (and), <code>|</code> (or), and wrap <strong>each condition in its own parentheses</strong>. This is a strict rule in NumPy.</p>
+<h3 id="npwhere-finding-positions"><code>np.where</code> — Finding Positions</h3>
+<p>Where masking returns the <em>values</em>, <code>np.where</code> returns the <strong>index positions</strong> where a condition is true:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mat1</span> <span class="o">&gt;</span> <span class="mi">25</span><span class="p">)</span>                   <span class="c1"># the positions of values &gt; 25</span>
+<span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">mat1</span> <span class="o">&gt;</span> <span class="mi">25</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">mat1</span> <span class="o">&lt;</span> <span class="mi">45</span><span class="p">))</span>   <span class="c1"># positions matching both conditions</span>
+</code></pre></div>
+
+<p>A second, very powerful form of <code>np.where</code> acts like an if/else for arrays. We'll use that in the case study at the end.</p>
+<hr />
+<h2 id="part-6-universal-functions-math-on-whole-arrays"><span class="h-icon"><svg class="icon"><use href="#icon-math"></use></svg></span>Part 6: Universal Functions (Math on Whole Arrays)</h2>
+<p>"Universal functions" (ufuncs) are functions that operate on every element of an array at once. They come in two flavors: those that take two arrays, and those that transform a single array.</p>
+<h3 id="two-array-math">Two-Array Math</h3>
+<p>Let's say we have two 3×3 arrays, <code>arr3</code> and <code>arr4</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">arr3</span><span class="p">,</span> <span class="n">arr4</span><span class="p">)</span>        <span class="c1"># same as arr3 + arr4</span>
+<span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">arr3</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>          <span class="c1"># adds 10 to every element</span>
+<span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">arr3</span><span class="p">,</span> <span class="n">arr4</span><span class="p">)</span>   <span class="c1"># same as arr3 - arr4</span>
+<span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">arr3</span><span class="p">,</span> <span class="n">arr4</span><span class="p">)</span>   <span class="c1"># ELEMENT-WISE multiply (not matrix multiply!)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">arr3</span><span class="p">,</span> <span class="n">arr4</span><span class="p">)</span>     <span class="c1"># same as arr3 / arr4</span>
+</code></pre></div>
+
+<p>There's an important distinction here. <code>np.multiply</code> multiplies matching positions. <strong>Matrix multiplication</strong> (the real linear-algebra operation) is a different function, <code>np.dot</code>:</p>
+<div class="diagram-card"><pre><code>   ELEMENT-WISE (np.multiply)        MATRIX MULTIPLY (np.dot)
+
+   [a b]   [e f]   [a·e  b·f]        [a b]   [e f]   [ae+bg  af+bh]
+   [c d] × [g h] = [c·g  d·h]        [c d] · [g h] = [ce+dg  cf+dh]
+
+   each cell × matching cell         rows combined with columns
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">arr3</span><span class="p">,</span> <span class="n">arr4</span><span class="p">)</span>        <span class="c1"># matrix multiplication, same as arr3 @ arr4</span>
+</code></pre></div>
+
+<h3 id="single-array-transformations">Single-Array Transformations</h3>
+<p>These take one array (or number) and transform every value:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it does</th>
+<th>Example result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>np.log(10)</code></td>
+<td>natural log (base <em>e</em>)</td>
+<td>2.302</td>
+</tr>
+<tr>
+<td><code>np.log2(10)</code></td>
+<td>log base 2</td>
+<td>3.321</td>
+</tr>
+<tr>
+<td><code>np.log10(10)</code></td>
+<td>log base 10</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td><code>np.exp(5)</code></td>
+<td><em>e</em> raised to the power</td>
+<td>148.4</td>
+</tr>
+<tr>
+<td><code>np.sqrt(800)</code></td>
+<td>square root</td>
+<td>28.28</td>
+</tr>
+<tr>
+<td><code>np.square(80)</code></td>
+<td>the square</td>
+<td>6400</td>
+</tr>
+<tr>
+<td><code>np.abs(-10)</code></td>
+<td>absolute value</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>np.ceil(4.56)</code></td>
+<td>round <em>up</em></td>
+<td>5.0</td>
+</tr>
+<tr>
+<td><code>np.floor(3.81)</code></td>
+<td>round <em>down</em></td>
+<td>3.0</td>
+</tr>
+<tr>
+<td><code>np.round(12.6781, 2)</code></td>
+<td>round to N decimals</td>
+<td>12.68</td>
+</tr>
+</tbody>
+</table></div>
+<p>The ceiling/floor pair is easy to remember with a picture:</p>
+<div class="diagram-card"><pre><code>            ceil → 5.0      (always rounds UP to next integer)
+              ▲
+            4.56
+              ▼
+           floor → 4.0      (always rounds DOWN)
+</code></pre></div>
+
+<h3 id="percentiles">Percentiles</h3>
+<p>A <strong>percentile</strong> tells you the value below which a given percentage of data falls. The 25th percentile is the value that 25% of the data sits below:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">([</span><span class="mi">150</span><span class="p">,</span><span class="mi">120</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">45</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">78</span><span class="p">,</span><span class="mi">81</span><span class="p">,</span><span class="mi">93</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">33</span><span class="p">,</span><span class="mi">110</span><span class="p">],</span> <span class="mi">25</span><span class="p">)</span>  <span class="c1"># 25th percentile</span>
+<span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">([</span><span class="o">...</span><span class="p">],</span> <span class="mi">50</span><span class="p">)</span>    <span class="c1"># 50th percentile = the median</span>
+<span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">([</span><span class="o">...</span><span class="p">],</span> <span class="mi">100</span><span class="p">)</span>   <span class="c1"># 100th percentile = the maximum</span>
+</code></pre></div>
+
+<h3 id="comparison-and-validity-checks">Comparison and Validity Checks</h3>
+<p>These ufuncs compare arrays element-by-element or check for special values:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>        <span class="c1"># [True, False, False]</span>
+<span class="n">np</span><span class="o">.</span><span class="n">not_equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>    <span class="c1"># [False, True, True]</span>
+<span class="n">np</span><span class="o">.</span><span class="n">greater</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>      <span class="c1"># [False, False, True]</span>
+<span class="n">np</span><span class="o">.</span><span class="n">less</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>         <span class="c1"># [False, True, False]</span>
+</code></pre></div>
+
+<p>NumPy has special values for "infinity" (<code>np.inf</code>) and "not a number / missing" (<code>np.nan</code>). You check for them with:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">])</span>
+<span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>   <span class="c1"># True only for normal, finite numbers</span>
+<span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>      <span class="c1"># True where the value is infinite</span>
+<span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>      <span class="c1"># True where the value is missing (NaN)</span>
+</code></pre></div>
+
+<p>Finally, <code>np.any</code> and <code>np.all</code> collapse a whole array into a single yes/no:</p>
+<ul>
+<li><code>np.any(arr)</code> → <strong>True if at least one</strong> element is truthy (non-zero).</li>
+<li><code>np.all(arr)</code> → <strong>True only if every</strong> element is truthy.</li>
+</ul>
+<div class="diagram-card"><pre><code>   arr = [1, 2, 0, 4]
+   np.any(arr) → True   (at least one non-zero)
+   np.all(arr) → False  (one value is 0, so not ALL are truthy)
+</code></pre></div>
+
+<hr />
+<h2 id="part-7-aggregation-and-the-all-important-axis"><span class="h-icon"><svg class="icon"><use href="#icon-aggregate"></use></svg></span>Part 7: Aggregation: and the All-Important <code>axis</code></h2>
+<p>Aggregation functions summarize an array down to fewer numbers: <code>np.sum</code>, <code>np.min</code>, <code>np.max</code>, <code>np.mean</code>. On their own, they collapse the <em>entire</em> array to a single value:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">arr3</span><span class="p">)</span>    <span class="c1"># one number: the total of everything</span>
+<span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">arr3</span><span class="p">)</span>   <span class="c1"># one number: the average of everything</span>
+</code></pre></div>
+
+<p>But the real power appears with the <code>axis</code> parameter, which controls <strong>which direction</strong> you collapse. This is the concept beginners struggle with most, so here's the picture:</p>
+<div class="diagram-card"><pre><code>   axis=0  →  collapse DOWN the columns (one result per column)
+   axis=1  →  collapse ACROSS the rows  (one result per row)
+
+           col0 col1 col2
+   row0  [  1    2    3  ]  ──► axis=1 sums across →  6
+   row1  [  4    5    6  ]  ──► axis=1 sums across → 15
+           │    │    │
+           ▼    ▼    ▼
+   axis=0  5    7    9      (sums down each column)
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">arr3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>    <span class="c1"># column totals  → [5, 7, 9]</span>
+<span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">arr3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>    <span class="c1"># row totals     → [6, 15]</span>
+<span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">arr3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>    <span class="c1"># max of each column</span>
+<span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">arr3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># average of each row</span>
+</code></pre></div>
+
+<p>A simple way to remember it: <strong>axis=0 squashes the rows together (vertical), axis=1 squashes the columns together (horizontal).</strong></p>
+<hr />
+<h2 id="part-8-sorting"><span class="h-icon"><svg class="icon"><use href="#icon-sort"></use></svg></span>Part 8: Sorting</h2>
+<h3 id="1d-arrays-copy-vs-in-place">1D Arrays — Copy vs. In-Place</h3>
+<p>There's a subtle but important difference between two ways of sorting:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">arr_unsorted</span><span class="p">)</span>   <span class="c1"># returns a SORTED COPY; original is untouched</span>
+<span class="n">arr_unsorted</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>     <span class="c1"># sorts IN-PLACE; modifies the original, returns None</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   np.sort(a)              a.sort()
+   ┌─────────────┐         ┌─────────────┐
+   │ a unchanged │         │ a is now    │
+   │ copy → new  │         │ sorted      │
+   └─────────────┘         └─────────────┘
+   &quot;give me a sorted copy&quot;  &quot;sort yourself&quot;
+</code></pre></div>
+
+<h3 id="argsort-sorting-by-position"><code>argsort</code> — Sorting by Position</h3>
+<p><code>np.argsort</code> doesn't return the sorted values; it returns the <strong>indices that would sort the array</strong>. This is incredibly useful when you want to reorder <em>one</em> array based on the order of <em>another</em> (we'll use exactly this in the case study):</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">arr_unsorted_2</span><span class="p">)</span>   <span class="c1"># e.g. [3, 0, 1, 2] — &quot;put position 3 first, then 0...&quot;</span>
+</code></pre></div>
+
+<h3 id="2d-arrays">2D Arrays</h3>
+<p>For 2D arrays, sorting respects the <code>axis</code> direction:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">arr_2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                   <span class="p">[</span><span class="mi">1</span><span class="p">,</span>  <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span>
+                   <span class="p">[</span><span class="mi">2</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">]])</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">arr_2d</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>   <span class="c1"># sorts within each column</span>
+<span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">arr_2d</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># sorts within each row</span>
+</code></pre></div>
+
+<hr />
+<h2 id="part-9-combining-and-splitting-arrays"><span class="h-icon"><svg class="icon"><use href="#icon-stack"></use></svg></span>Part 9: Combining and Splitting Arrays</h2>
+<h3 id="stacking-arrays-together">Stacking Arrays Together</h3>
+<p>There are several ways to glue arrays together. The two foundational ones are concatenation along an axis:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">arr3</span><span class="p">,</span> <span class="n">arr4</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>   <span class="c1"># stack top-and-bottom (vertically)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">arr3</span><span class="p">,</span> <span class="n">arr4</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># stack side-by-side (horizontally)</span>
+</code></pre></div>
+
+<p>NumPy provides friendlier named shortcuts that do the same thing:</p>
+<div class="diagram-card"><pre><code>   vstack / concatenate axis=0          hstack / concatenate axis=1
+   (stack vertically)                   (stack horizontally)
+
+   [A A A]                              [A A A] [B B B]
+   [A A A]            +B  →             [A A A] [B B B]
+   [B B B]   ← B added below            ▲ A and B side by side
+   [B B B]
+</code></pre></div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>np.vstack((a, b))</code></td>
+<td>stack vertically (same as concatenate axis=0)</td>
+</tr>
+<tr>
+<td><code>np.hstack((a, b))</code></td>
+<td>stack horizontally (same as concatenate axis=1)</td>
+</tr>
+<tr>
+<td><code>np.column_stack((a, b))</code></td>
+<td>stack 1D arrays as columns</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="splitting-arrays-apart">Splitting Arrays Apart</h3>
+<p><code>np.split</code> breaks one array into several pieces. The second argument tells it how:</p>
+<ul>
+<li>An <strong>integer <code>n</code></strong> splits the array into <em>n</em> equal parts.</li>
+<li>A <strong>list of indices</strong> splits at those exact positions.</li>
+</ul>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">arr_big</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">arr_big</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># split into 2 along columns</span>
+<span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">arr_big</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>   <span class="c1"># split into 4 along rows</span>
+<span class="n">np</span><span class="o">.</span><span class="n">hsplit</span><span class="p">(</span><span class="n">arr_big</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>          <span class="c1"># horizontal split shortcut</span>
+<span class="n">np</span><span class="o">.</span><span class="n">vsplit</span><span class="p">(</span><span class="n">arr_big</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>          <span class="c1"># vertical split shortcut</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   np.hsplit(arr, 2)            np.vsplit(arr, 2)
+   ┌────┬────┐                  ┌─────────┐
+   │ L  │ R  │   →  [L] [R]     │   TOP   │   →  [TOP]
+   │    │    │                  ├─────────┤      [BOTTOM]
+   └────┴────┘                  │ BOTTOM  │
+                                └─────────┘
+</code></pre></div>
+
+<hr />
+<h2 id="part-10-inspecting-an-array"><span class="h-icon"><svg class="icon"><use href="#icon-why"></use></svg></span>Part 10: Inspecting an Array</h2>
+<p>When you receive an unfamiliar array, these attributes tell you everything about its structure. Notice they have <strong>no parentheses</strong>. They're descriptions of the object, not actions:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">arr_big</span><span class="o">.</span><span class="n">shape</span>    <span class="c1"># (rows, columns) — its dimensions</span>
+<span class="n">arr_big</span><span class="o">.</span><span class="n">size</span>     <span class="c1"># total number of elements</span>
+<span class="n">arr_big</span><span class="o">.</span><span class="n">ndim</span>     <span class="c1"># number of dimensions (1, 2, 3...)</span>
+<span class="n">arr_big</span><span class="o">.</span><span class="n">nbytes</span>   <span class="c1"># total memory used, in bytes</span>
+<span class="n">arr_big</span><span class="o">.</span><span class="n">dtype</span>    <span class="c1"># the data type of the elements (e.g. int64)</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   arr_big  (a 12 × 10 array of integers)
+   ┌────────────────────────────┐
+   │ .shape  → (12, 10)          │
+   │ .size   → 120               │
+   │ .ndim   → 2                 │
+   │ .nbytes → 960  (120 × 8)    │
+   │ .dtype  → int64             │
+   └────────────────────────────┘
+</code></pre></div>
+
+<hr />
+<h2 id="part-11-reshaping-changing-the-form-without-changing-the-data"><span class="h-icon"><svg class="icon"><use href="#icon-why"></use></svg></span>Part 11: Reshaping: Changing the Form Without Changing the Data</h2>
+<p>Reshaping rearranges the same numbers into a different grid. The total number of elements must stay the same.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">arr_big</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>    <span class="c1"># 120 elements → 24 rows × 5 cols (24×5 = 120 ✓)</span>
+</code></pre></div>
+
+<h3 id="the-magic-1">The Magic <code>-1</code></h3>
+<p>If you put <code>-1</code> for one dimension, NumPy <strong>figures it out for you</strong>. If you have 120 elements and ask for 15 columns, NumPy works out you need 8 rows:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">arr_big</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>   <span class="c1"># &quot;15 columns, you figure out the rows&quot; → 8 rows</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   120 elements, reshape(-1, 15)
+   &quot;I want 15 columns. How many rows?&quot;
+   120 ÷ 15 = 8  →  NumPy fills in 8 automatically
+</code></pre></div>
+
+<h3 id="transpose-flipping-rows-and-columns">Transpose — Flipping Rows and Columns</h3>
+<p><code>transpose()</code> (or the shortcut <code>.T</code>) swaps rows and columns:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">arr_big</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>   <span class="c1"># rows become columns, columns become rows</span>
+<span class="n">arr_big</span><span class="o">.</span><span class="n">T</span>             <span class="c1"># identical, shorter</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   original          transpose (.T)
+   [1 2 3]           [1 4]
+   [4 5 6]    →      [2 5]
+                     [3 6]
+   2 rows, 3 cols    3 rows, 2 cols
+</code></pre></div>
+
+<h3 id="flatten-vs-ravel-a-critical-distinction"><code>flatten</code> vs <code>ravel</code> — A Critical Distinction</h3>
+<p>Both turn a multi-dimensional array into a flat 1D array, but they differ in a way that can cause real bugs if you don't understand it:</p>
+<ul>
+<li><strong><code>ravel()</code></strong> returns a <strong>view when possible</strong>. If the array is stored contiguously in memory (the common case), ravel shares the original data. For non-contiguous arrays (e.g. after a transpose), ravel has to make a copy instead. Either way, changing a ravel result <em>may</em> change the original.</li>
+<li><strong><code>flatten()</code></strong> always makes a <strong>copy</strong>, regardless of memory layout. Changing the result never touches the original.</li>
+</ul>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">]])</span>
+
+<span class="n">rav</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="n">rav</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">99</span>       <span class="c1"># this ALSO changes arr! (shared memory)</span>
+
+<span class="n">flat</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">flat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">88</span>      <span class="c1"># arr stays the same (independent copy)</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   ravel()  → VIEW (window onto the same data)
+   ┌──────────┐         change the view →
+   │ original │ ◄─────── change shows up in original too
+   └──────────┘
+
+   flatten() → COPY (separate data)
+   ┌──────────┐  copy   ┌──────────┐
+   │ original │ ──────► │   copy   │  change here →
+   └──────────┘         └──────────┘  original untouched
+</code></pre></div>
+
+<hr />
+<h2 id="part-12-shallow-vs-deep-copy-shared-memory"><span class="h-icon"><svg class="icon"><use href="#icon-why"></use></svg></span>Part 12: Shallow vs Deep Copy (Shared Memory)</h2>
+<p>This builds on the <code>ravel</code>/<code>flatten</code> idea and is one of NumPy's most important, and most surprising behaviors. <strong>NumPy avoids copying data whenever it can.</strong> Reshaping and slicing often hand you a <em>new view of the same underlying data</em>, not a fresh copy.</p>
+<p>Watch what happens with a reshape:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>      <span class="c1"># [0 1 2 3]</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>   <span class="c1"># b is a VIEW of a</span>
+
+<span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>             <span class="c1"># change a...</span>
+<span class="c1"># ...and b changes too! They share the same data.</span>
+</code></pre></div>
+
+<p>The same surprise happens with slicing:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">mat1_new</span> <span class="o">=</span> <span class="n">mat1</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>   <span class="c1"># a slice — shares memory with mat1</span>
+<span class="n">mat1_new</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">25</span>       <span class="c1"># changing the slice ALSO changes mat1</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   a ──┐
+       ├──► [ shared data block ]   ← changing through either name
+   b ──┘                              changes what BOTH see
+
+   This is a SHALLOW COPY: the data is reused, not duplicated.
+</code></pre></div>
+
+<h3 id="deep-copy-when-you-want-true-independence">Deep Copy — When You Want True Independence</h3>
+<p>If you want a genuinely separate array whose changes won't leak back, use <code>.copy()</code>. This is a <strong>deep copy</strong>: its own memory, fully independent.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">original</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">deep_copy</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="n">deep_copy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">77</span>       <span class="c1"># original stays [1, 2, 3, 4]</span>
+<span class="n">np</span><span class="o">.</span><span class="n">shares_memory</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">deep_copy</span><span class="p">)</span>   <span class="c1"># False — proof they&#39;re separate</span>
+</code></pre></div>
+
+<p>The takeaway: <strong>NumPy uses shallow copies (shared data) for cheap operations like reshape and slicing to stay fast. When you make permanent changes that should not affect the original, use <code>.copy()</code>.</strong> And whenever you're unsure whether two arrays share memory, <code>np.shares_memory(a, b)</code> will tell you.</p>
+<hr />
+<h2 id="part-13-broadcasting-math-between-different-shaped-arrays"><span class="h-icon"><svg class="icon"><use href="#icon-why"></use></svg></span>Part 13: Broadcasting: Math Between Different-Shaped Arrays</h2>
+<p>Normally, doing math between two arrays requires them to be the same shape. <strong>Broadcasting</strong> is NumPy's clever system for stretching a smaller array to match a bigger one automatically, so the math just works.</p>
+<p>The helper <code>np.tile</code> literally repeats an array to build bigger ones. To build the 4×3 matrix shown in the diagram below, we tile a column vector across 3 columns:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>   <span class="c1"># column vector: [[0],[10],[20],[30]]</span>
+<span class="n">big_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>           <span class="c1"># repeat 3 times sideways → shape (4, 3)</span>
+</code></pre></div>
+
+<p>But broadcasting does this stretching <em>implicitly</em>. Picture adding a single row to a full matrix:</p>
+<div class="diagram-card"><pre><code>   Big matrix (4×3)         Small row (1×3)
+
+   [ 0   0   0 ]            [ 0  1  2 ]
+   [10  10  10 ]     +
+   [20  20  20 ]
+   [30  30  30 ]
+
+   Broadcasting &quot;stretches&quot; the small row down to all 4 rows:
+
+   [ 0   0   0 ]     [ 0  1  2 ]      [ 0   1   2 ]
+   [10  10  10 ]  +  [ 0  1  2 ]   =  [10  11  12 ]
+   [20  20  20 ]     [ 0  1  2 ]      [20  21  22 ]
+   [30  30  30 ]     [ 0  1  2 ]      [30  31  32 ]
+                     ▲ replicated automatically
+</code></pre></div>
+
+<p>The single row <code>[0, 1, 2]</code> is <strong>broadcast</strong> across all four rows without you ever writing a loop or manually copying it. This is what makes NumPy code so concise. Operations that would need nested loops in plain Python become a single <code>+</code>.</p>
+<hr />
+<h2 id="part-14-getting-data-in-and-out-of-files"><span class="h-icon"><svg class="icon"><use href="#icon-why"></use></svg></span>Part 14: Getting Data In and Out of Files</h2>
+<p>So far we've built arrays by hand. In the real world, data lives in files. NumPy can read it in and write it back out.</p>
+<h3 id="reading-text-files">Reading Text Files</h3>
+<p>There are two main loaders, and the choice depends on whether your data has gaps:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">&#39;data.txt&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>     <span class="c1"># use when NO missing values</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s1">&#39;data_miss.txt&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># handles missing values</span>
+</code></pre></div>
+
+<p><code>np.loadtxt</code> is strict, which <strong>errors out</strong> if any value is missing. <code>np.genfromtxt</code> is forgiving , filling any gaps with <code>nan</code>. The rule of thumb:</p>
+<div class="diagram-card"><pre><code>   Clean data, no gaps   →  np.loadtxt   (fast, strict)
+   Real data with gaps   →  np.genfromtxt (fills blanks with NaN)
+</code></pre></div>
+
+<p>Try it on a file that actually has a gap and <code>np.loadtxt</code> stops cold instead of guessing:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">&#39;data_miss.txt&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># ValueError: could not convert string &#39;&#39; to float64 at row 8, column 3.</span>
+</code></pre></div>
+
+<p>Swap in <code>np.genfromtxt</code> on that exact same file and it loads without complaint, dropping a <code>nan</code> into the empty cell instead of raising:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s1">&#39;data_miss.txt&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>   <span class="c1"># the gap becomes nan, the rest loads fine</span>
+</code></pre></div>
+
+<h3 id="reading-csvs-with-mixed-types">Reading CSVs with Mixed Types</h3>
+<p>CSV files often mix text and numbers (e.g. a customer's name <em>and</em> age). By default NumPy assumes everything is a float, which mangles text columns. Loading the Mall Customers file (which has a text "Genre" column) the naive way turns that whole column into <code>nan</code>, since "Male" and "Female" simply can't be parsed as numbers:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s1">&#39;Mall_Customers.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>   <span class="c1"># default dtype is float — the Genre column becomes nan</span>
+</code></pre></div>
+
+<p>Forcing <code>dtype=&#39;object&#39;</code> stops the column from being wiped out, but it creates a different headache: every single value, numbers included, comes back as a Python <code>bytes</code> object instead of a real number:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s1">&#39;Mall_Customers.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="n">skip_header</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>   <span class="c1"># → array([[b&#39;1&#39;, b&#39;Male&#39;, b&#39;19&#39;, b&#39;15&#39;, b&#39;39&#39;], ...], dtype=object)</span>
+</code></pre></div>
+
+<p>Those <code>b'19'</code>-style values <em>look</em> like numbers but are bytes underneath, so any arithmetic on them blows up:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="c1"># try dividing 4th col with 3rd col and we get an error</span>
+<span class="n">data</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="c1"># TypeError: unsupported operand type(s) for /: &#39;bytes&#39; and &#39;bytes&#39;</span>
+</code></pre></div>
+
+<p>The clean solution is to define a <strong>structured dtype</strong> that names each column and gives it the right type up front:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">({</span><span class="s1">&#39;names&#39;</span><span class="p">:</span>   <span class="p">[</span><span class="s2">&quot;CustomerID&quot;</span><span class="p">,</span> <span class="s2">&quot;Genre&quot;</span><span class="p">,</span> <span class="s2">&quot;Age&quot;</span><span class="p">,</span> <span class="s2">&quot;Annual_Income&quot;</span><span class="p">,</span> <span class="s2">&quot;Spending_Score&quot;</span><span class="p">],</span>
+               <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">,</span>     <span class="s1">&#39;U16&#39;</span><span class="p">,</span>   <span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">,</span>      <span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">]})</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s1">&#39;Mall_Customers.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">skip_header</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Here <code>skip_header=1</code> skips the header row, <code>'U16'</code> means "text up to 16 characters," and each numeric column gets a proper integer type. Check <code>data.ndim</code> afterward and you'll see it's <code>1</code>, not 2 — this is a 1D array of labeled records, one per row, not a grid. (In practice, this is exactly the kind of job where most people reach for Pandas instead, but it's good to know NumPy can do it — and the result drops straight into a DataFrame with <code>pd.DataFrame(data)</code> if you want to take it from there.)</p>
+<h3 id="saving-and-loading-arrays">Saving and Loading Arrays</h3>
+<p>To save arrays in NumPy's own fast binary format:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;output.npy&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>        <span class="c1"># ONE array → .npy file</span>
+<span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="s1">&#39;outputs.npz&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>      <span class="c1"># MULTIPLE arrays → .npz file</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;output.npy&#39;</span><span class="p">)</span>          <span class="c1"># load it back</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   .npy  →  a single array
+   .npz  →  several arrays in one file (named arr_0, arr_1, ...)
+</code></pre></div>
+
+<hr />
+<h2 id="part-15-putting-it-all-together-a-real-case-study"><span class="h-icon"><svg class="icon"><use href="#icon-why"></use></svg></span>Part 15: Putting It All Together: A Real Case Study</h2>
+<p>Let's see why all of this matters. Imagine you're a <strong>data scientist at a major ride-sharing company</strong> (like Uber or Lyft). The city operations team hands you a batch of ride data from a busy Friday night and wants deep insights into driver efficiency, surge pricing dynamics, and rider satisfaction, all in service of optimizing the matching algorithm. Every technique below uses something from this guide.</p>
+<h3 id="loading-and-splitting-the-columns">Loading and Splitting the Columns</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="s1">&#39;ride_data.csv&#39;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">skip_header</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">ride_ids</span>   <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>   <span class="c1"># column slicing pulls out each variable</span>
+<span class="n">driver_ids</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">distances</span>  <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>   <span class="c1"># distance in miles</span>
+<span class="n">durations</span>  <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span>   <span class="c1"># duration in minutes</span>
+<span class="n">fares</span>      <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span>   <span class="c1"># fare in USD</span>
+<span class="n">surges</span>     <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">]</span>   <span class="c1"># surge multiplier (e.g. 1.2 = 20% extra)</span>
+<span class="n">d_ratings</span>  <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">6</span><span class="p">]</span>   <span class="c1"># driver rating</span>
+<span class="n">r_ratings</span>  <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">7</span><span class="p">]</span>   <span class="c1"># rider rating</span>
+</code></pre></div>
+
+<p>Notice <code>data[:, 0]</code>. The slice "all rows, column 0." This is 2D indexing in action. Here's what each column actually holds:</p>
+<ul>
+<li><code>ride_id</code> — the unique ID given to every ride.</li>
+<li><code>driver_id</code> — the unique ID of each driver.</li>
+<li><code>distance_miles</code> — distance covered from origin to destination.</li>
+<li><code>duration_minutes</code> — how long the ride took.</li>
+<li><code>fare_usd</code> — the total fare of the ride, in US dollars.</li>
+<li><code>surge_multiplier</code> — activates during high demand; a multiplier of 1.2 means the rider pays the normal fare × 1.2.</li>
+<li><code>driver_rating</code> — the rating the rider gave the driver.</li>
+<li><code>rider_rating</code> — the rating the driver gave the rider.</li>
+</ul>
+<h3 id="revenue-gmv-and-the-platforms-cut">Revenue: GMV and the Platform's Cut</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">gmv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">fares</span><span class="p">)</span>                <span class="c1"># Gross Merchandise Value — every dollar paid</span>
+<span class="n">platform_revenue</span> <span class="o">=</span> <span class="n">gmv</span> <span class="o">*</span> <span class="mf">0.25</span>      <span class="c1"># the company keeps a 25% commission</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total GMV: $</span><span class="si">{</span><span class="n">gmv</span><span class="p">:</span><span class="o">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s2"> | Platform Cut: $</span><span class="si">{</span><span class="n">platform_revenue</span><span class="p">:</span><span class="o">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Total GMV: $503.50 | Platform Cut: $125.88</span>
+</code></pre></div>
+
+<p>For this batch of rides, the platform collected <strong>$503.50</strong> in total fares and kept <strong>$125.88</strong> of it as commission. <strong>GMV</strong> (Gross Merchandise Value) is the total of every dollar that flowed through the platform <em>before</em> anyone takes their cut. The analogy: if you build an app connecting bakers to customers and someone buys a $100 cake, your <em>revenue</em> might be a $10 fee, but the <em>GMV</em> of that sale is the full $100. Big platforms (Uber, Airbnb, Amazon, eBay) live and die by GMV because it's the ultimate vanity metric for scale — a $1 billion GMV means the platform controls a massive chunk of that market. It also dictates the platform's <em>ceiling</em>: you can't grow revenue without either taking a bigger cut (which angers the supply side, e.g. drivers) or growing the overall GMV.</p>
+<h3 id="speed-check-element-wise-math-masking">Speed Check (Element-wise Math + Masking)</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">speeds_mph</span> <span class="o">=</span> <span class="n">distances</span> <span class="o">/</span> <span class="p">(</span><span class="n">durations</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span>     <span class="c1"># element-wise: speed for every ride</span>
+<span class="n">speeding_rides</span> <span class="o">=</span> <span class="n">ride_ids</span><span class="p">[</span><span class="n">speeds_mph</span> <span class="o">&gt;</span> <span class="mi">65</span><span class="p">]</span>    <span class="c1"># masking: which rides exceeded 65 mph</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Speeding Ride IDs:&quot;</span><span class="p">,</span> <span class="n">speeding_rides</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>   <span class="c1"># Speeding Ride IDs: [16]</span>
+</code></pre></div>
+
+<p>One line computes speed for <em>every</em> ride at once (element-wise division), and a boolean mask instantly isolates the suspicious ones — here, a single ride (ID 16) came back clocking over 65 mph, which is worth a manual look (bad GPS data, a highway trip misclassified, etc.).</p>
+<h3 id="surge-revenue-reverse-engineering-with-division">Surge Revenue (Reverse-Engineering with Division)</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">base_fares</span> <span class="o">=</span> <span class="n">fares</span> <span class="o">/</span> <span class="n">surges</span>                       <span class="c1"># undo the surge to find the base fare</span>
+<span class="n">surge_extra_revenue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">fares</span> <span class="o">-</span> <span class="n">base_fares</span><span class="p">)</span>   <span class="c1"># how much was pure surge premium</span>
+<span class="c1"># Extra Revenue from Surge: $57.42</span>
+</code></pre></div>
+
+<p><strong>Surge pricing</strong> is a dynamic pricing model: the surge multiplier is the exact number the base fare gets multiplied by (1.5x, 2x, ...) during periods of high demand. Dividing the fare by the surge factor reverse-engineers what the ride would have cost without it, so the gap between the two is pure surge revenue — $57.42 of it here. It exists to solve a simple supply-and-demand problem, and it does two things at once:</p>
+<ul>
+<li><strong>Incentivizes supply</strong> — a "2.0x surge in that area" notification pulls more drivers toward the high-demand zone.</li>
+<li><strong>Controls demand</strong> — it discourages riders who don't urgently need a ride right now, freeing up cars for people willing to pay the premium (someone rushing to the airport, say).</li>
+</ul>
+<h3 id="statistics-median-argmax-percentiles">Statistics: Median, Argmax, Percentiles</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">median_rating</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">d_ratings</span><span class="p">)</span>         <span class="c1"># the typical driver rating → 4.7</span>
+<span class="n">max_fare_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">fares</span><span class="p">)</span>              <span class="c1"># POSITION of the single highest fare</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Highest fare was $</span><span class="si">{</span><span class="n">fares</span><span class="p">[</span><span class="n">max_fare_idx</span><span class="p">]</span><span class="si">}</span><span class="s2"> on Ride ID </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">ride_ids</span><span class="p">[</span><span class="n">max_fare_idx</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Highest fare was $85.0 on Ride ID 12</span>
+<span class="n">p90_fare</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">fares</span><span class="p">,</span> <span class="mi">90</span><span class="p">)</span>          <span class="c1"># the &quot;high-value&quot; threshold → $54.00</span>
+</code></pre></div>
+
+<p><code>np.argmax</code> returns the <em>index</em> of the largest value, so <code>ride_ids[max_fare_idx]</code> tells you exactly which ride earned the most (Ride 12, at $85). The <strong>90th percentile</strong> is the dollar amount that separates the top 10% most expensive rides from the bottom 90% — here, $54.00 means 90% of rides cost less than that, and only the priciest tenth cost more. A ride can cross that line for several reasons: a long-distance airport run, a 3.0x surge, or a premium vehicle tier. Data scientists calculate it for a few concrete reasons:</p>
+<ul>
+<li><strong>Operations</strong> — route the best, 5-star drivers to these high-value riders to protect the experience.</li>
+<li><strong>Marketing</strong> — run a targeted campaign, e.g. "spend over $55 on a ride and get a free coffee voucher."</li>
+<li><strong>Anomaly detection</strong> — a ride way past this threshold (say, $400) is worth a manual check in case the GPS glitched or the driver took a longer route than necessary.</li>
+</ul>
+<h3 id="quick-ratios-with-npmean-on-a-mask">Quick Ratios with <code>np.mean</code> on a Mask</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">short_trips_pct</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">distances</span> <span class="o">&lt;</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>   <span class="c1"># % of rides under 3 miles → 25.0%</span>
+</code></pre></div>
+
+<p>This is a neat trick: <code>distances &lt; 3.0</code> is a mask of <code>True</code>/<code>False</code>, and since <code>True</code> counts as 1, taking the <strong>mean of a mask gives you the proportion</strong> that satisfied the condition — a quarter of the night's rides here. Multiply by 100 for a percentage.</p>
+<h3 id="per-ride-calculations-and-perfect-matches">Per-Ride Calculations and Perfect Matches</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">rating_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">d_ratings</span> <span class="o">-</span> <span class="n">r_ratings</span><span class="p">)</span>        <span class="c1"># disagreement per trip</span>
+<span class="n">dollars_per_minute</span> <span class="o">=</span> <span class="n">fares</span> <span class="o">/</span> <span class="n">durations</span>             <span class="c1"># earning efficiency per ride</span>
+<span class="n">perfect_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">d_ratings</span> <span class="o">==</span> <span class="mf">5.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">r_ratings</span> <span class="o">==</span> <span class="mf">5.0</span><span class="p">)</span>   <span class="c1"># both gave 5 stars</span>
+<span class="n">perfect_rides</span> <span class="o">=</span> <span class="n">ride_ids</span><span class="p">[</span><span class="n">perfect_mask</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Perfect Match Ride IDs:&quot;</span><span class="p">,</span> <span class="n">perfect_rides</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>   <span class="c1"># Perfect Match Ride IDs: [10]</span>
+</code></pre></div>
+<p>Three independent, per-ride calculations in one breath: <code>rating_diff</code> flags trips where driver and rider disagreed on quality, <code>dollars_per_minute</code> measures how efficiently each ride earned, and the <code>perfect_mask</code> boolean filter isolates the rides where both sides gave a flawless 5.0 — only Ride 10 managed that here.</p>
+
+<h3 id="npwhere-as-ifelse-driver-payouts-with-a-penalty"><code>np.where</code> as If/Else: Driver Payouts with a Penalty</h3>
+<p>Here's the powerful second form of <code>np.where</code>, which works like an if/else across the whole array at once:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">standard_payout</span> <span class="o">=</span> <span class="n">fares</span> <span class="o">*</span> <span class="mf">0.75</span>
+<span class="n">adjusted_payout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d_ratings</span> <span class="o">&lt;</span> <span class="mf">4.0</span><span class="p">,</span>        <span class="c1"># CONDITION</span>
+                           <span class="n">standard_payout</span> <span class="o">-</span> <span class="mf">3.00</span><span class="p">,</span>  <span class="c1"># value if True (penalty)</span>
+                           <span class="n">standard_payout</span><span class="p">)</span>         <span class="c1"># value if False</span>
+<span class="c1"># Adjusted Payouts (First 5): [13.88 33.75  6.75 24.    9.38]</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   np.where(condition, value_if_true, value_if_false)
+
+   driver rating &lt; 4.0 ?
+        ├─ YES → payout − $3 penalty
+        └─ NO  → normal payout
+   ...applied to every driver simultaneously
+</code></pre></div>
+
+<h3 id="running-totals-and-counting-uniques">Running Totals and Counting Uniques</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">cum_fares</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">fares</span><span class="p">)</span>    <span class="c1"># running total as the night progresses — ends at 403.5</span>
+
+<span class="n">unique_drivers</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">driver_ids</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">busiest_driver</span> <span class="o">=</span> <span class="n">unique_drivers</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">counts</span><span class="p">)]</span>   <span class="c1"># most rides completed → Driver 101</span>
+</code></pre></div>
+
+<p><code>np.cumsum</code> gives a <em>cumulative sum</em>: fare after ride 1, after rides 1+2, and so on. <code>np.unique</code> with <code>return_counts=True</code> lists each distinct driver alongside how many rides they did, and <code>np.argmax</code> finds the busiest.</p>
+<h3 id="sorting-one-array-by-another-argsort-in-action">Sorting One Array by Another (<code>argsort</code> in action)</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">sorted_ride_ids</span> <span class="o">=</span> <span class="n">ride_ids</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">durations</span><span class="p">)]</span>   <span class="c1"># ride IDs, shortest trip first</span>
+</code></pre></div>
+
+<p>This is the classic <code>argsort</code> pattern: sort the <em>durations</em>, get the order of positions that would sort them, then apply that same order to the <em>ride IDs</em> array instead. It looks like a basic housekeeping task, but ordering rides by duration immediately surfaces two categories that matter a lot to the business: the shortest trips and the longest ones.</p>
+<p><strong>1. Analyzing "micro-trips" (the shortest durations).</strong> At the top of the sorted list — rides taking 2 to 5 minutes — you're looking at trips that are often inefficient for cars. A driver might spend 8 minutes fighting through city traffic just to pick someone up for a 2-minute ride; they earn very little and feel like their time was wasted. Once the platform can see the volume of these micro-trips, it can respond: introduce a "minimum fare" so drivers earn a fair amount regardless of trip length, or — if thousands of 3-minute rides cluster in one area — deploy a fleet of e-bikes or scooters there instead, nudging the app to suggest: "A car is $8 and takes 5 mins. A scooter is $2 and takes 4 mins."</p>
+<p><strong>2. Managing "deadheading" (the longest durations).</strong> At the bottom of the sorted list — 45+ minute rides — you're looking at rare but high-revenue outliers that create a logistical headache. A driver who takes a 60-minute ride out of the busy city center then has to drive 60 minutes back <em>empty</em>, since there's no demand where they dropped off. Driving empty like this is called "deadheading," and it costs the driver fuel and time with no fare to show for it. Spotting these long-duration rides is what led platforms to build features like a "Destination Filter" (matching a driver heading back to the city with a rider who wants to go the same way) and a "long trip premium" fee that compensates the driver for the empty return leg.</p>
+<h3 id="reshaping-into-a-3d-tensor-for-machine-learning">Reshaping into a 3D Tensor for Machine Learning</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy-btn"></use></svg>Copy</button></div><pre><code><span class="n">ratings_subset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">d_ratings</span><span class="p">[:</span><span class="mi">12</span><span class="p">],</span> <span class="n">r_ratings</span><span class="p">[:</span><span class="mi">12</span><span class="p">]))</span>   <span class="c1"># stack into 2×12</span>
+<span class="n">tensor_3d</span> <span class="o">=</span> <span class="n">ratings_subset</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>                    <span class="c1"># reshape to 2×2×6</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;3D Tensor Shape:&quot;</span><span class="p">,</span> <span class="n">tensor_3d</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>   <span class="c1"># 3D Tensor Shape: (2, 2, 6)</span>
+</code></pre></div>
+
+<p>The ML team needs the first 12 driver and rider ratings reshaped into a 3D <strong>tensor</strong> for a neural network input. We <code>vstack</code> the two rating arrays together into a 2×12 grid, then <code>reshape</code> those same 24 values into a 2×2×6 cube — combining stacking and reshaping, both covered earlier, without changing a single value.</p>
+<hr />
+<h2 id="quick-reference-summary"><span class="h-icon"><svg class="icon"><use href="#icon-table"></use></svg></span>Quick Reference Summary</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Import NumPy</td>
+<td><code>import numpy as np</code></td>
+</tr>
+<tr>
+<td>Make array from list</td>
+<td><code>np.array([1, 2, 3])</code></td>
+</tr>
+<tr>
+<td>Sequence</td>
+<td><code>np.arange(start, end, step)</code></td>
+</tr>
+<tr>
+<td>All ones / zeros</td>
+<td><code>np.ones((r,c))</code> / <code>np.zeros((r,c))</code></td>
+</tr>
+<tr>
+<td>Filled with a value</td>
+<td><code>np.full((r,c), val)</code></td>
+</tr>
+<tr>
+<td>Identity matrix</td>
+<td><code>np.identity(n)</code></td>
+</tr>
+<tr>
+<td>Random integers</td>
+<td><code>np.random.randint(low, high, size)</code></td>
+</tr>
+<tr>
+<td>Indexing / slicing</td>
+<td><code>arr[2]</code>, <code>arr[1:5]</code>, <code>arr[::-1]</code></td>
+</tr>
+<tr>
+<td>Negative index</td>
+<td><code>arr[-1]</code> (last element)</td>
+</tr>
+<tr>
+<td>Masking (filter)</td>
+<td><code>arr[arr &gt; 25]</code></td>
+</tr>
+<tr>
+<td>Combine conditions</td>
+<td><code>arr[(a &gt; 1) &amp; (a &lt; 9)]</code></td>
+</tr>
+<tr>
+<td>Find positions</td>
+<td><code>np.where(arr &gt; 25)</code></td>
+</tr>
+<tr>
+<td>If/else over array</td>
+<td><code>np.where(cond, if_true, if_false)</code></td>
+</tr>
+<tr>
+<td>Element-wise multiply</td>
+<td><code>np.multiply(a, b)</code> or <code>a * b</code></td>
+</tr>
+<tr>
+<td>Matrix multiply</td>
+<td><code>np.dot(a, b)</code> or <code>a @ b</code></td>
+</tr>
+<tr>
+<td>Rounding</td>
+<td><code>np.ceil()</code>, <code>np.floor()</code>, <code>np.round(x, 2)</code></td>
+</tr>
+<tr>
+<td>Percentile / median</td>
+<td><code>np.percentile(a, 90)</code> / <code>np.median(a)</code></td>
+</tr>
+<tr>
+<td>Check missing/infinite</td>
+<td><code>np.isnan(a)</code>, <code>np.isinf(a)</code></td>
+</tr>
+<tr>
+<td>Any / all true</td>
+<td><code>np.any(a)</code> / <code>np.all(a)</code></td>
+</tr>
+<tr>
+<td>Aggregate by column</td>
+<td><code>np.sum(a, axis=0)</code></td>
+</tr>
+<tr>
+<td>Aggregate by row</td>
+<td><code>np.sum(a, axis=1)</code></td>
+</tr>
+<tr>
+<td>Sort (copy)</td>
+<td><code>np.sort(a)</code></td>
+</tr>
+<tr>
+<td>Sort (in-place)</td>
+<td><code>a.sort()</code></td>
+</tr>
+<tr>
+<td>Sort indices</td>
+<td><code>np.argsort(a)</code></td>
+</tr>
+<tr>
+<td>Index of max/min</td>
+<td><code>np.argmax(a)</code> / <code>np.argmin(a)</code></td>
+</tr>
+<tr>
+<td>Running total</td>
+<td><code>np.cumsum(a)</code></td>
+</tr>
+<tr>
+<td>Unique + counts</td>
+<td><code>np.unique(a, return_counts=True)</code></td>
+</tr>
+<tr>
+<td>Stack vertical / horizontal</td>
+<td><code>np.vstack((a,b))</code> / <code>np.hstack((a,b))</code></td>
+</tr>
+<tr>
+<td>Split</td>
+<td><code>np.split(a, n, axis=)</code></td>
+</tr>
+<tr>
+<td>Shape / size / dims</td>
+<td><code>a.shape</code>, <code>a.size</code>, <code>a.ndim</code></td>
+</tr>
+<tr>
+<td>Reshape (auto dim)</td>
+<td><code>a.reshape(-1, cols)</code></td>
+</tr>
+<tr>
+<td>Transpose</td>
+<td><code>a.T</code></td>
+</tr>
+<tr>
+<td>Flatten (copy) / ravel (view)</td>
+<td><code>a.flatten()</code> / <code>a.ravel()</code></td>
+</tr>
+<tr>
+<td>Deep copy</td>
+<td><code>a.copy()</code></td>
+</tr>
+<tr>
+<td>Check shared memory</td>
+<td><code>np.shares_memory(a, b)</code></td>
+</tr>
+<tr>
+<td>Read text / with gaps</td>
+<td><code>np.loadtxt()</code> / <code>np.genfromtxt()</code></td>
+</tr>
+<tr>
+<td>Save / load</td>
+<td><code>np.save()</code> / <code>np.load()</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p>NumPy is the bedrock of the entire Python data science world. Once arrays feel natural: creating them, slicing them, filtering with masks, doing element-wise math, reshaping, and understanding when data is shared versus copied, everything built on top of it (Pandas, scikit-learn, deep learning frameworks) becomes far easier to reason about. The best way to make it stick is to grab a real CSV and try the case-study operations on it yourself: compute some sums by axis, filter rows with a mask, sort one column by another with <code>argsort</code>, and watch how a single line of NumPy replaces what would have been a tangle of loops.</p>
+
+      <div class="article-end">
+        <p><strong>NumPy is the bedrock of the entire Python data science world.</strong> Once arrays feel natural — creating them, slicing them, filtering with masks, doing element-wise math, reshaping, and understanding when data is shared versus copied — everything built on top of it becomes far easier to reason about. Grab a real CSV and try the case-study operations yourself: compute sums by axis, filter rows with a mask, sort one column by another with <code>argsort</code>. A single line of NumPy replaces what would have been a tangle of loops.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="f-left">Python Data Science Series &nbsp;/&nbsp; Article 12 of the course</div>
+  <div class="f-right"><a href="#top">Back to top ↑</a></div>
+</footer>
+</body>
+</html>
