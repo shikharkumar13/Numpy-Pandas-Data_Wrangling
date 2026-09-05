@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data Wrangling in Python: Cleaning Real-World Data · Python Data Science Series</title>
+<meta name="description" content="A complete guide to data wrangling in Python: missing-data types, cleaning strategies, KNN and Iterative imputation, deduplication, and column engineering — with a full real-world walkthrough.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>:root{
+  --bg:#F5F0E8;--bg-grid:rgba(90,50,30,.045);--surface:#fff;--surface-soft:#FAF5EE;
+  --ink:#241A12;--ink-soft:#4A3C30;--ink-faint:#998672;
+  --rust:#B5452A;--rust-text:#9C3A22;--rust-soft:rgba(181,69,42,.1);
+  --slate:#3D5A6C;--slate-text:#2F4756;--slate-soft:rgba(61,90,108,.1);
+  --amber:#C98A1F;--amber-text:#A8720F;--amber-soft:rgba(201,138,31,.11);
+  --line:#E3D6C3;--line-strong:#CBB89C;
+  --code-bg:#1E140C;--code-text:#F0E4D4;--code-line:#2C1E12;
+  --r-s:6px;--r-m:10px;--r-l:16px;
+  --shadow:0 1px 3px rgba(36,26,18,.06),0 8px 28px -12px rgba(36,26,18,.16);
+  --font-d:'Space Grotesk','Arial Narrow',sans-serif;
+  --font-b:'IBM Plex Sans',-apple-system,'Segoe UI',sans-serif;
+  --font-m:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:linear-gradient(var(--bg-grid) 1px,transparent 1px) 0 0/28px 28px,linear-gradient(90deg,var(--bg-grid) 1px,transparent 1px) 0 0/28px 28px,var(--bg);color:var(--ink);font-family:var(--font-b);font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased;}
+a{color:var(--rust-text);text-decoration-color:rgba(181,69,42,.3);text-underline-offset:2px;}
+a:hover{text-decoration-color:currentColor;}
+::selection{background:var(--rust);color:#fff;}
+:focus-visible{outline:2.5px solid var(--slate);outline-offset:2px;border-radius:3px;}
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.15em;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ── Shell ── */
+.shell{max-width:1300px;margin:0 auto;padding:0 clamp(16px,4vw,44px);}
+.topbar{display:none;position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;padding:12px clamp(16px,4vw,44px);background:rgba(245,240,232,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+.topbar .brand{font-family:var(--font-d);font-weight:700;font-size:.93rem;}
+.topbar .brand span{color:var(--rust-text);}
+.topbar button{border:1.5px solid var(--line-strong);background:var(--surface);border-radius:var(--r-s);width:38px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);}
+
+/* ── Hero ── */
+.hero{padding:clamp(48px,7vw,88px) 0 clamp(32px,5vw,52px);}
+.hero-eyebrow{font-family:var(--font-m);font-size:.77rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rust-text);font-weight:500;display:flex;align-items:center;gap:.6em;margin-bottom:18px;}
+.hero-eyebrow::before{content:"";width:26px;height:2px;background:var(--rust);display:inline-block;}
+h1.title{font-family:var(--font-d);font-weight:700;font-size:clamp(2rem,4.2vw,3.3rem);line-height:1.08;letter-spacing:-.02em;margin:0 0 18px;max-width:23ch;}
+h1.title em{font-style:normal;color:var(--rust-text);}
+.hero-sub{font-size:clamp(1rem,1.55vw,1.16rem);color:var(--ink-soft);max-width:66ch;margin:0 0 30px;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:9px;}
+.chip{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);padding:8px 14px 8px 10px;border-radius:999px;font-family:var(--font-m);font-size:.76rem;color:var(--ink-soft);box-shadow:var(--shadow);}
+.chip .icon{width:1.1em;height:1.1em;}
+.chip:nth-child(1) .icon{color:var(--rust);}
+.chip:nth-child(2) .icon{color:var(--slate);}
+.chip:nth-child(3) .icon{color:var(--amber);}
+.chip:nth-child(4) .icon{color:var(--rust);}
+.chip:nth-child(5) .icon{color:var(--slate);}
+
+/* ── Page layout ── */
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:clamp(24px,4vw,52px);align-items:start;padding-bottom:100px;}
+.sidebar{position:sticky;top:28px;max-height:calc(100vh - 56px);overflow-y:auto;padding-right:6px;}
+.sidebar::-webkit-scrollbar{width:5px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px;}
+.toc-label{font-family:var(--font-m);font-size:.71rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin:4px 0 10px;padding-left:14px;}
+.toc{list-style:none;margin:0 0 16px;padding:0;border-left:1.5px solid var(--line);}
+.toc li{margin:0;}
+.toc a{display:flex;align-items:center;gap:9px;padding:6px 14px;margin-left:-1.5px;padding-left:12.5px;border-left:1.5px solid transparent;font-size:.83rem;color:var(--ink-soft);text-decoration:none;transition:all .14s;border-radius:0 var(--r-s) var(--r-s) 0;}
+.toc a .icon{width:1em;height:1em;flex:none;color:var(--ink-faint);transition:color .14s;}
+.toc a:hover{color:var(--ink);background:var(--surface-soft);}
+.toc a.active{color:var(--rust-text);border-left-color:var(--rust);background:var(--rust-soft);font-weight:500;}
+.toc a.active .icon{color:var(--rust);}
+
+/* ── Prose ── */
+.article{min-width:0;padding-top:10px;}
+.article h2{font-family:var(--font-d);font-weight:600;font-size:clamp(1.45rem,2.4vw,1.82rem);letter-spacing:-.01em;margin:58px 0 16px;padding-top:8px;scroll-margin-top:22px;display:flex;align-items:center;gap:12px;}
+.article>h2:first-of-type{margin-top:6px;}
+.article h2 .h-icon{width:1.4rem;height:1.4rem;flex:none;color:var(--rust);}
+.article h2 .h-icon .icon{width:100%;height:100%;}
+.article h3{font-family:var(--font-d);font-weight:600;font-size:1.08rem;margin:28px 0 10px;scroll-margin-top:22px;}
+.article p{margin:0 0 16px;}
+.article ul,.article ol{margin:0 0 18px;padding-left:1.3em;}
+.article li{margin-bottom:7px;}
+.article li::marker{color:var(--rust);}
+.article strong{font-weight:600;}
+.article hr{border:none;border-top:1px solid var(--line);margin:44px 0;}
+.article code{font-family:var(--font-m);font-size:.85em;background:var(--surface-soft);border:1px solid var(--line);padding:.1em .36em;border-radius:4px;color:var(--slate-text);}
+.article blockquote{margin:20px 0;padding:12px 16px;border-left:3px solid var(--amber);background:var(--amber-soft);border-radius:0 var(--r-s) var(--r-s) 0;color:var(--ink-soft);}
+.article blockquote p{margin:0;color:inherit;}
+
+/* ── Tables ── */
+.table-wrap{overflow-x:auto;margin:20px 0 26px;border-radius:var(--r-m);box-shadow:var(--shadow);}
+.article table{width:100%;border-collapse:collapse;background:var(--surface);font-size:.88rem;}
+.article thead th{background:var(--slate);color:#fff;font-family:var(--font-d);font-weight:600;text-align:left;padding:11px 15px;white-space:nowrap;font-size:.8rem;letter-spacing:.01em;}
+.article tbody td{padding:10px 15px;border-bottom:1px solid var(--line);vertical-align:top;}
+.article tbody tr:last-child td{border-bottom:none;}
+.article tbody tr:nth-child(even){background:var(--surface-soft);}
+.article tbody td code{white-space:nowrap;}
+
+/* ── Code cards ── */
+.code-card{margin:20px 0 24px;border-radius:var(--r-m);overflow:hidden;background:var(--code-bg);box-shadow:var(--shadow);}
+.code-card .code-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#150D07;border-bottom:1px solid var(--code-line);}
+.code-card .dots{display:flex;gap:5px;}
+.code-card .dots span{width:8px;height:8px;border-radius:50%;display:block;}
+.code-card .dots span:nth-child(1){background:#E8664A;}
+.code-card .dots span:nth-child(2){background:#E3B23C;}
+.code-card .dots span:nth-child(3){background:#7EA86A;}
+.code-card .lang{font-family:var(--font-m);font-size:.7rem;color:#B08858;letter-spacing:.06em;}
+.code-card .copy-btn{font-family:var(--font-m);font-size:.7rem;color:#B89A78;background:transparent;border:1px solid #3A2818;border-radius:5px;padding:3px 9px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .14s;}
+.code-card .copy-btn:hover{background:#3A2414;color:#F0E4D4;border-color:#6A4A28;}
+.code-card .copy-btn .icon{width:.9em;height:.9em;}
+.code-card pre{margin:0;padding:14px 18px;overflow-x:auto;}
+.code-card code{font-family:var(--font-m);font-size:.855rem;line-height:1.6;color:var(--code-text);background:none;border:none;padding:0;}
+/* tokens */
+.code-card .k,.code-card .kn,.code-card .kd{color:#7EC0D8;}
+.code-card .nb{color:#7EC0D8;}
+.code-card .nf,.code-card .fm{color:#6AC8A8;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa{color:#D9C86A;}
+.code-card .mi,.code-card .mf{color:#F5945A;}
+.code-card .o,.code-card .p{color:#8A7A68;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#7A6248;font-style:italic;}
+.code-card .n{color:var(--code-text);}
+.code-card .nc{color:#F0C878;}
+.code-card .se{color:#E89858;}
+.code-card .si{color:#D9C86A;}
+
+/* ── Diagram cards ── */
+.diagram-card{margin:20px 0 24px;border-radius:var(--r-m);overflow:hidden;position:relative;border:1.5px dashed var(--line-strong);background:linear-gradient(var(--bg-grid) 1px,transparent 1px) 0 0/18px 18px,linear-gradient(90deg,var(--bg-grid) 1px,transparent 1px) 0 0/18px 18px,var(--surface-soft);}
+.diagram-card::before{content:"diagram";position:absolute;top:9px;right:12px;font-family:var(--font-m);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);}
+.diagram-card pre{margin:0;padding:24px 20px 18px;overflow-x:auto;}
+.diagram-card code{font-family:var(--font-m);font-size:.8rem;line-height:1.55;color:var(--ink-soft);background:none;border:none;padding:0;white-space:pre;}
+
+/* ── Workflow card ── */
+.workflow-card{margin:24px 0 28px;border-radius:var(--r-l);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--surface);}
+.workflow-card .wf-head{background:var(--rust);color:#fff;padding:14px 20px;font-family:var(--font-d);font-weight:600;font-size:.95rem;letter-spacing:.01em;}
+.workflow-steps{display:flex;flex-direction:column;padding:8px 0;}
+.wf-step{display:flex;align-items:flex-start;gap:16px;padding:12px 20px;}
+.wf-step:not(:last-child){border-bottom:1px solid var(--line);}
+.wf-num{width:28px;height:28px;border-radius:50%;background:var(--rust);color:#fff;font-family:var(--font-d);font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex:none;}
+.wf-content{flex:1;}
+.wf-content strong{font-family:var(--font-d);font-weight:600;font-size:.95rem;display:block;margin-bottom:3px;color:var(--rust-text);}
+.wf-content code{font-family:var(--font-m);font-size:.82em;color:var(--slate-text);background:var(--surface-soft);border:1px solid var(--line);padding:.1em .32em;border-radius:3px;}
+.wf-content span{font-size:.88rem;color:var(--ink-soft);}
+
+/* ── Callout (gotcha / caution) ── */
+.callout{margin:20px 0 24px;padding:16px 18px;border-radius:var(--r-m);border:1px solid var(--rust);background:var(--rust-soft);}
+.callout .callout-label{font-family:var(--font-m);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rust-text);font-weight:600;display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.callout p{margin:0;color:var(--ink-soft);}
+.callout p:not(:last-child){margin-bottom:10px;}
+
+/* ── Article end ── */
+.article-end{margin-top:52px;padding:26px 24px;border-radius:var(--r-m);background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);}
+.article-end p{margin:0;font-size:1rem;color:var(--ink-soft);}
+.article-end p strong{color:var(--ink);}
+
+footer.site-footer{border-top:1px solid var(--line);margin-top:36px;padding:22px clamp(16px,4vw,44px) 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer.site-footer .f-left{font-family:var(--font-m);font-size:.76rem;color:var(--ink-faint);}
+footer.site-footer a{font-size:.8rem;color:var(--ink-soft);}
+
+@media(max-width:960px){
+  .topbar{display:flex;}
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:fixed;inset:57px 0 0 0;z-index:35;background:var(--bg);padding:16px clamp(16px,4vw,44px) 24px;transform:translateX(-100%);transition:transform .2s;max-height:none;height:calc(100vh - 57px);}
+  .sidebar.open{transform:translateX(0);}
+  .workflow-card .wf-step{padding:10px 16px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true"><defs>
+<symbol id="icon-why" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".9" fill="currentColor" stroke="none"/></symbol>
+<symbol id="icon-broom" viewBox="0 0 24 24"><path d="M14 3 L21 10"/><path d="M13 4 L4 13 A5 5 0 0 0 11 20 L20 11"/><line x1="7" y1="16" x2="4" y2="21"/><line x1="9.5" y1="18" x2="7" y2="22.5"/></symbol>
+<symbol id="icon-grid-gap" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="2" y1="15" x2="22" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15.5" y1="3" x2="15.5" y2="21"/><line x1="10.5" y1="10.5" x2="14" y2="14" stroke-dasharray="1.5 2"/><line x1="14" y1="10.5" x2="10.5" y2="14" stroke-dasharray="1.5 2"/></symbol>
+<symbol id="icon-quad" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="1.5"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></symbol>
+<symbol id="icon-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.3" y1="15.3" x2="21" y2="21"/></symbol>
+<symbol id="icon-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2z"/></symbol>
+<symbol id="icon-puzzle" viewBox="0 0 24 24"><path d="M9 3h4v2.5a1.7 1.7 0 0 0 3 1 1.7 1.7 0 0 1 3 1V11h-2.5a1.7 1.7 0 0 0 0 3H21v4h-4v-2.5a1.7 1.7 0 0 0-3 1 1.7 1.7 0 0 1-3 1V16H8.5a1.7 1.7 0 0 1 0-3H11V9H8.5a1.7 1.7 0 0 1-3-1A1.7 1.7 0 0 0 3 9V5h4V3z"/></symbol>
+<symbol id="icon-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M11 12 L21 2"/><path d="M17 6 L20 9"/><path d="M14 9 L17 12"/></symbol>
+<symbol id="icon-dupe" viewBox="0 0 24 24"><rect x="3" y="3" width="13" height="13" rx="1.5"/><rect x="8" y="8" width="13" height="13" rx="1.5" fill="var(--surface)" stroke="currentColor"/></symbol>
+<symbol id="icon-split" viewBox="0 0 24 24"><line x1="4" y1="4" x2="12" y2="12"/><line x1="4" y1="20" x2="12" y2="12"/><line x1="12" y1="12" x2="21" y2="7"/><line x1="12" y1="12" x2="21" y2="17"/></symbol>
+<symbol id="icon-workflow" viewBox="0 0 24 24"><rect x="2" y="3" width="6" height="4" rx="1"/><rect x="2" y="10" width="6" height="4" rx="1"/><rect x="2" y="17" width="6" height="4" rx="1"/><line x1="8" y1="5" x2="22" y2="5"/><line x1="8" y1="12" x2="22" y2="12"/><line x1="8" y1="19" x2="22" y2="19"/></symbol>
+<symbol id="icon-table" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15.5" y1="3" x2="15.5" y2="21"/></symbol>
+<symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="1.6"/><path d="M5 16H4.5A1.5 1.5 0 0 1 3 14.5v-10A1.5 1.5 0 0 1 4.5 3h10A1.5 1.5 0 0 1 16 4.5V5"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12.5 L9.5 18 L20 5"/></symbol>
+<symbol id="icon-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+<symbol id="icon-close" viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></symbol>
+<symbol id="icon-warning" viewBox="0 0 24 24"><path d="M12 3 L22 20 L2 20 Z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/></symbol>
+</defs></svg>
+
+<div class="topbar">
+  <span class="brand">§13 &nbsp;<span>Data Wrangling</span></span>
+  <button id="navToggle" aria-label="Toggle navigation">
+    <svg class="icon"><use href="#icon-menu"></use></svg>
+  </button>
+</div>
+<div class="shell">
+  <section class="hero">
+    <div class="hero-eyebrow">Python Data Science Series &nbsp;·&nbsp; Article 13</div>
+    <h1 class="title">Data Wrangling: A Practical Guide to <em>Cleaning Real Data</em></h1>
+    <p class="hero-sub">Raw data is never ready to analyze. It arrives with holes in it, rows copied twice, dates jammed into a single text field, and numbers stored as the wrong type. <strong>Data wrangling is the work of turning that mess into something you can trust</strong> — and it's where most of the real time in a data science project actually goes. This guide walks through the full process on a real, messy housing dataset: diagnosing what's missing and why, deciding what to fix versus what to drop, imputing what's left with increasingly smart tools, clearing out duplicates, and engineering clean new columns out of raw text.</p>
+    <div class="hero-chips">
+      <div class="chip"><svg class="icon"><use href="#icon-grid-gap"></use></svg> Diagnosing missing data</div>
+      <div class="chip"><svg class="icon"><use href="#icon-quad"></use></svg> MCAR, MAR &amp; MNAR explained</div>
+      <div class="chip"><svg class="icon"><use href="#icon-puzzle"></use></svg> KNN &amp; Iterative imputation</div>
+      <div class="chip"><svg class="icon"><use href="#icon-dupe"></use></svg> Finding true duplicates</div>
+      <div class="chip"><svg class="icon"><use href="#icon-split"></use></svg> Splitting messy columns</div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="toc-label">On this page</div>
+      <ul class="toc">
+        <li><a href="#what-is-data-wrangling"><svg class="icon"><use href="#icon-why"></use></svg><span>What Is Data Wrangling?</span></a></li>
+<li><a href="#part-1-understanding-missing-data"><svg class="icon"><use href="#icon-grid-gap"></use></svg><span>Part 1: Understanding Missing Data</span></a></li>
+<li><a href="#part-2-the-four-types-of-missing-data"><svg class="icon"><use href="#icon-quad"></use></svg><span>Part 2: The Four Types of Missing Data</span></a></li>
+<li><a href="#part-3-finding-what-and-where-things-are-missing"><svg class="icon"><use href="#icon-search"></use></svg><span>Part 3: Finding What (and Where) Is Missing</span></a></li>
+<li><a href="#part-4-cleaning-a-real-dataset-step-by-step"><svg class="icon"><use href="#icon-wrench"></use></svg><span>Part 4: Cleaning a Real Dataset, Step by Step</span></a></li>
+<li><a href="#part-5-smarter-imputation-knn-and-iterative"><svg class="icon"><use href="#icon-puzzle"></use></svg><span>Part 5: Smarter Imputation — KNN and Iterative</span></a></li>
+<li><a href="#part-6-key-takeaways-for-missing-data"><svg class="icon"><use href="#icon-key"></use></svg><span>Part 6: Key Takeaways for Missing Data</span></a></li>
+<li><a href="#part-7-finding-and-removing-duplicate-rows"><svg class="icon"><use href="#icon-dupe"></use></svg><span>Part 7: Finding and Removing Duplicate Rows</span></a></li>
+<li><a href="#part-8-engineering-new-columns-from-existing-ones"><svg class="icon"><use href="#icon-split"></use></svg><span>Part 8: Engineering New Columns from Existing Ones</span></a></li>
+<li><a href="#the-complete-data-wrangling-workflow-at-a-glance"><svg class="icon"><use href="#icon-workflow"></use></svg><span>The Complete Workflow at a Glance</span></a></li>
+<li><a href="#quick-reference-summary"><svg class="icon"><use href="#icon-table"></use></svg><span>Quick Reference Summary</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="article">
+<p>Every dataset you'll ever load has been touched by messy reality before it reaches you: a sensor that dropped a reading, a form field a customer skipped, a spreadsheet someone copy-pasted twice. <strong>Data wrangling</strong> — also called data cleaning or data munging — is the process of taking that raw data and making it ready for analysis. It's unglamorous work, but it's also the work that determines whether every chart and model you build afterward can be trusted at all.</p>
+<p>This guide works through a real, messy dataset end to end: a Melbourne housing snapshot with the kind of problems every analyst runs into — missing values scattered unevenly across columns, rows that shouldn't be there twice, and a date column crammed into a single text field. Throughout, you'll find <strong>visual diagrams</strong> showing exactly what's happening to the data, because wrangling is a lot easier to reason about when you can see the shape of the problem.</p>
+<hr />
+<h2 id="what-is-data-wrangling"><span class="h-icon"><svg class="icon"><use href="#icon-why"></use></svg></span>What Is Data Wrangling?</h2>
+<p>Data as it's collected is almost never analysis-ready. It typically has some combination of the following problems:</p>
+<ul>
+<li><strong>Missing values</strong> — empty cells, blanks, or placeholder codes standing in for data that was never recorded</li>
+<li><strong>Incorrect format</strong> — numbers stored as text, dates stored as free-form strings, categories stored as inconsistent casing</li>
+<li><strong>Duplicate values</strong> — the same record appearing more than once, often from merged exports or repeated form submissions</li>
+<li><strong>Incorrect data</strong> — typos, impossible values (a negative age, a house with 40 bathrooms), or unit mismatches</li>
+<li><strong>Unnecessary data</strong> — columns or rows that don't serve the task at hand and just add noise</li>
+<li><strong>Improper column names</strong> — inconsistent casing, spaces, or names that don't describe what the column actually holds</li>
+</ul>
+<p>Data wrangling is the job of finding each of these problems and deciding, deliberately, what to do about it. The rest of this guide focuses on the two issues that eat the most time in practice — missing values and duplicates — plus the common task of reshaping a messy column into something usable.</p>
+<hr />
+<h2 id="part-1-understanding-missing-data"><span class="h-icon"><svg class="icon"><use href="#icon-grid-gap"></use></svg></span>Part 1: Understanding Missing Data</h2>
+<p>Data goes missing for all kinds of reasons: the observation genuinely doesn't exist, it existed but was never recorded, or it was recorded and then lost or corrupted somewhere along the way. Before you can fix missing data, it helps to recognize the disguises it shows up in.</p>
+<h3 id="how-missing-data-shows-up">How Missing Data Shows Up</h3>
+<p>Missing values aren't always a clean, empty cell. In real datasets, they hide behind:</p>
+<ul>
+<li>Explicit markers like <code>NA</code>, <code>N/A</code>, or <code>null</code></li>
+<li>A genuinely blank cell</li>
+<li>Dashes used as filler, like <code>-</code> or <code>--</code></li>
+<li>Sentinel values that look like real numbers but mean "missing", like <code>-1</code> or <code>999</code></li>
+</ul>
+<blockquote><p>That last category is the dangerous one. A blank cell announces itself. A <code>999</code> sitting in an "age" column looks like real data until you compute an average and wonder why it's 40 years too high.</p></blockquote>
+<h3 id="what-you-can-do-about-it">What You Can Do About It</h3>
+<p>Broadly, you have two families of response once you've found missing data:</p>
+<ol>
+<li><strong>Delete</strong> the observations or columns with missing or invalid values.</li>
+<li><strong>Substitute</strong> them with a suitable filled-in value (imputation).</li>
+</ol>
+<p>Alongside that, you'll also decide whether to keep or drop outliers depending on whether they represent real, valid extremes or errors, and whether to remove duplicate records that shouldn't be counted twice.</p>
+<h3 id="the-toolkit">The Toolkit</h3>
+<p>Pandas gives you a small set of methods that cover almost every missing-data situation. For <strong>identifying</strong> what's missing:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr><th>Method</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td><code>isnull()</code></td><td>Flags every missing value as <code>True</code></td></tr>
+<tr><td><code>notnull()</code></td><td>The opposite of <code>isnull()</code> — flags real values as <code>True</code></td></tr>
+<tr><td><code>dropna()</code></td><td>Drops observations containing missing values (with parameters to control exactly how)</td></tr>
+</tbody></table></div>
+<p>For <strong>filling</strong> what's missing:</p>
+<ul>
+<li>Fill with a constant value</li>
+<li>Fill with the <strong>mean</strong> or <strong>median</strong> of the column, for numerical data</li>
+<li>Fill with the <strong>mode</strong> (the most frequent value), for categorical data</li>
+<li>Advanced imputation with <strong>KNN</strong> or <strong>Iterative</strong> imputers, which use other columns to make a smarter guess</li>
+<li>For time-series data specifically: <strong>forward fill</strong> (<code>ffill</code>, carry the last known value forward) or <strong>backward fill</strong> (<code>bfill</code>, pull the next known value backward)</li>
+</ul>
+<p>Keep one thing in mind as you work through this: deleting and filling both cost you something. Delete too aggressively and you lose real data, possibly leaving too little to draw reliable conclusions from. Fill too aggressively and you're injecting assumed values into your dataset — values you made up, dressed as if they were observed. Every decision below is a trade-off between those two costs, not a search for a rule that avoids the trade-off entirely.</p>
+<hr />
+<h2 id="part-2-the-four-types-of-missing-data"><span class="h-icon"><svg class="icon"><use href="#icon-quad"></use></svg></span>Part 2: The Four Types of Missing Data</h2>
+<p>Not all missing data behaves the same way, and treating it as if it does is one of the most common mistakes in data cleaning. Statisticians classify missingness into four types, and which one you're dealing with should genuinely change what you do next.</p>
+<h3 id="structurally-missing-data">Structurally Missing Data</h3>
+<p>This is data that's missing for a completely logical reason — there was never anything to record. A survey column called <code>number_of_pregnancies</code> will be structurally missing for every male respondent. A field for <code>spouse_name</code> will be structurally missing for anyone who's unmarried. There's no mystery to solve here: the right move is usually to leave it missing (or encode it explicitly as "not applicable") rather than to impute a value that was never meant to exist.</p>
+<h3 id="missing-completely-at-random-mcar">Missing Completely at Random (MCAR)</h3>
+<p>Data is MCAR when the probability of any given data point being missing is exactly the same for every observation, with no pattern to it at all. This is mostly a theoretical ideal: data is genuinely MCAR only if every potential observation had an equal chance of going missing for that variable, with no logic, outside force, or hidden behavior driving it. A sensor that drops one reading in a thousand due to a random hardware glitch, unrelated to anything about the reading itself, is a reasonable real-world approximation.</p>
+<h3 id="missing-at-random-mar">Missing at Random (MAR)</h3>
+<p>MAR is probably the trickiest of the four to get an intuition for. Data is MAR when the <em>likelihood</em> of it being missing differs across groups, but is equally likely for every member <em>within</em> a group. It's a hybrid of "missing for a reason" and "missing completely at random".</p>
+<p>Here's a real, documented case of it: in a study tracking ambulance drivers' BMI over time (Heitjan, 1997, <em>American Journal of Public Health</em>), participants with a high, embarrassing BMI at their first measurement were less likely to come back for the follow-up measurement later, regardless of whether their weight had actually gone up or down in the meantime. That's MAR, not MNAR, because the missingness is explained by something already observed — the earlier BMI reading — not by the follow-up value itself. The key practical implication is that MAR data can often be validly imputed <em>if</em> you condition on the variable that explains the pattern (here, the earlier BMI reading), because the missingness isn't secretly tied to the unobserved follow-up value once you've accounted for that.</p>
+<h3 id="missing-not-at-random-mnar">Missing Not at Random (MNAR)</h3>
+<p>MNAR is the hardest case, and the one most likely to quietly bias your analysis. Data is MNAR when the probability of a value being missing depends on the <em>value itself</em> — a value you can't see, precisely because it's missing.</p>
+<p>The classic example: in an income survey, people with very high incomes are more likely to decline to answer than people with average incomes. The missingness isn't random, and it isn't explained by some other observed variable the way MAR is — it's driven directly by the unobserved number. This matters because there's no clever conditioning trick that fixes it: if you impute the missing incomes using the mean of what people <em>did</em> report, you'll systematically underestimate the true average, because the highest earners are exactly the ones missing from that mean. Recognizing MNAR is often more valuable than trying to "solve" it with imputation — at minimum, it should make you flag the bias explicitly rather than paper over it.</p>
+<div class="diagram-card"><pre><code>   STRUCTURAL           MCAR                  MAR                     MNAR
+   &quot;was never there&quot;    &quot;pure chance&quot;         &quot;chance depends on      &quot;chance depends on the
+                                               something you CAN      value itself, which
+                                               observe&quot;               you CAN&#x27;T observe&quot;
+
+   pregnancies for    →  sensor glitch,     →  BMI group predicts   →  high earners refuse
+   a male respondent     unrelated to           who skips the           to report income
+                          the reading            weight question
+
+   → leave as N/A      → safe to delete/     → impute, conditioning → flag the bias; naive
+     or &quot;not             impute, low risk      on the group that       imputation will
+     applicable&quot;                               drives the pattern      understate the truth
+</code></pre></div>
+<hr />
+<h2 id="part-3-finding-what-and-where-things-are-missing"><span class="h-icon"><svg class="icon"><use href="#icon-search"></use></svg></span>Part 3: Finding What (and Where) Is Missing</h2>
+<p><code>isnull()</code> and <code>notnull()</code> are the two workhorses for locating missing data. <code>isnull()</code> returns a boolean (<code>True</code>/<code>False</code>) mask that's the same shape as whatever you called it on, and <code>notnull()</code> is simply its inverse.</p>
+<p><strong>It's important to treat missing values in each column separately</strong>, rather than reaching for one blanket fix (like "replace every NaN with the column mean") and applying it everywhere. A missing price and a missing council area call for very different treatment, as you'll see shortly.</p>
+<h3 id="filtering-rows-by-a-column">Filtering Rows by a Column</h3>
+<p>A very common pattern is to use one column's missingness to filter the rows of an entire DataFrame. This relies on positional column indexing, which works cleanly when a DataFrame's columns default to <code>0, 1, 2...</code> — typically because it was loaded without a header row:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">raw</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span>
+    <span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;Age&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;City&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;Alice&#39;</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;NYC&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;LA&#39;</span><span class="p">],</span>
+<span class="p">])</span>
+<span class="n">raw</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>                   <span class="c1"># the first column, by position</span>
+<span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span>         <span class="c1"># True/False for each row: is column 0 non-null there?</span>
+<span class="n">raw</span><span class="p">[</span><span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()]</span>    <span class="c1"># keep only the rows where column 0 has a real value</span>
+</code></pre></div>
+<p>Here every row in column 0 happens to be filled, so this particular filter keeps everything. The pattern is the same regardless: <code>df[N]</code> pulls out a column by position, calling <code>.notnull()</code> on it turns that column into a True/False mask, and feeding that mask back into <code>df[...]</code> keeps only the matching rows.</p>
+<h3 id="filtering-columns-by-a-row">Filtering Columns by a Row</h3>
+<p>The mirror-image pattern filters <em>columns</em> based on which ones have a real value in a specific <em>row</em>. This shows up constantly with messy spreadsheet exports where the real header information got dumped into the first data row instead of the column names:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">raw</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>                              <span class="c1"># the first row, by label</span>
+<span class="n">raw</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span>                    <span class="c1"># True/False for each column: is row 0 non-null there?</span>
+<span class="n">raw</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">raw</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()]</span>        <span class="c1"># keep only the columns where row 0 has a real value</span>
+</code></pre></div>
+<div class="diagram-card"><pre><code>   raw.loc[0]  →  Name   Age   None   City
+                  True  True  False  True    ← raw.loc[0].notnull()
+
+   raw.loc[:, raw.loc[0].notnull()]  keeps columns 0, 1, 3 — drops the one
+   where row 0 itself was empty (the &quot;None&quot; column above)
+</code></pre></div>
+<p>Both patterns lean on the DataFrame's default labeling: <code>df[0]</code> only grabs "the first column" because the columns happen to be named <code>0, 1, 2...</code>, and <code>df.loc[0]</code> only grabs "the first row" because the index happens to be labeled <code>0, 1, 2...</code>. If either has been changed to something else (say, after a <code>set_index()</code> call), you'd reach for <code>.iloc[0]</code> instead, which always means "position zero" regardless of the labels.</p>
+<h3 id="the-standard-missing-data-checklist">The Standard Missing-Data Checklist</h3>
+<p>Put together, here's the small set of checks that covers almost every situation, run against a real dataset we'll now load and clean:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">missingno</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">msno</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;melbourne.csv&#39;</span><span class="p">)</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div>
+<p>This is the <a href="https://www.kaggle.com/datasets/dansbecker/melbourne-housing-snapshot">Melbourne Housing Snapshot</a> dataset — a real, publicly available scrape of Melbourne property sales, with all the messiness that comes from real-world data collection. It's an excellent dataset for practicing wrangling precisely because nothing about it has been artificially cleaned up for you.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># Check the number of missing values in each column</span>
+<span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># count of columns which have at least 1 missing value</span>
+<span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># list of all the columns which have any missing values</span>
+<span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()]</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># a True/False flag for every row: does it have at least one missing value?</span>
+<span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># select the rows in which every single value is missing</span>
+<span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+</code></pre></div>
+<p>With these five lines, you know exactly how bad the problem is: how many values are missing per column, how many columns are affected at all, which ones they are, which rows have at least one gap, and whether any row is missing <em>everything</em> (a strong signal that row shouldn't exist at all). Now you're ready to actually treat what you've found.</p>
+<hr />
+<h2 id="part-4-cleaning-a-real-dataset-step-by-step"><span class="h-icon"><svg class="icon"><use href="#icon-wrench"></use></svg></span>Part 4: Cleaning a Real Dataset, Step by Step</h2>
+<p>There are, broadly, two things you can do with a missing value once you've found it: delete it, or impute (fill) it. Deleting loses data outright; imputing risks manufacturing values that were never really observed and quietly biasing your dataset toward whatever assumption you filled in with. The right call always depends on three things: how important the column is to your task, how much of the column is actually missing, and what you're using the data for.</p>
+<h3 id="deciding-column-by-column">Deciding Column by Column</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">round</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+<p>A handful of columns are missing a substantial share of their values. To decide what to do with each one, weigh:</p>
+<ul>
+<li>The importance of that column to the task at hand</li>
+<li>How much data is actually available once you account for the gap</li>
+<li>What the data will ultimately be used for</li>
+</ul>
+<p><code>Price</code>, for instance, is the single most important column if this data is headed toward a predictive model — it's the thing you'd be predicting — so it's not a candidate for deletion no matter how much of it were missing. <code>BuildingArea</code> and <code>YearBuilt</code>, on the other hand, are each missing more than half their values, and <code>CouncilArea</code> isn't far behind them. There's no good way to fill in half a column without introducing heavy bias, and there's not enough left to justify keeping just the observed half either, so the more defensible move is to drop all three columns entirely:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># dropping the columns with more than 30% missing values</span>
+<span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BuildingArea&#39;</span><span class="p">,</span> <span class="s1">&#39;YearBuilt&#39;</span><span class="p">,</span> <span class="s1">&#39;CouncilArea&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="deciding-row-by-row">Deciding Row by Row</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">round</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+</code></pre></div>
+<p>After dropping those three columns, every remaining row has 18 fields. If a given row is missing more than five of those eighteen, that's a strong sign the whole record was poorly collected rather than just one field slipping through — and a record like that isn't very trustworthy for any of its other columns either.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">]</span>
+</code></pre></div>
+<p>Sorting by one of the geographic columns and visualizing the missingness with <code>missingno</code> makes the pattern easy to spot at a glance:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">sorted_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Lattitude&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">msno</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">sorted_data</span><span class="p">)</span>
+</code></pre></div>
+<p>If the rows with heavy missingness cluster together with the exact same columns blank each time, that's the signature of a batch of records that simply weren't collected properly — not a coincidence, but a systematic gap in how that slice of the data was gathered. Records like that are usually not worth trying to salvage.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">])</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span>
+</code></pre></div>
+<p>With roughly 18% of rows this badly incomplete, dropping them is a reasonable trade: it costs less than a fifth of the dataset, and what's left is far more trustworthy.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">)]</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">round</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="the-price-column">The Price Column</h3>
+<p>Most of the damage is now cleaned up, but <code>Price</code> still has a meaningful chunk missing. As established above, it's the most important column here if this data is heading toward predictive modelling — filling it in would mean training a model partly on values you invented, which defeats the purpose. So for <code>Price</code> specifically, the rows with a missing value get dropped rather than filled:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">])]</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+</code></pre></div>
+<blockquote><p><code>~np.isnan(...)</code> works fine here, but the more idiomatic (and more readable) Pandas way to say the same thing is <code>data[data['Price'].notna()]</code>, or even more directly, <code>data.dropna(subset=['Price'])</code>. All three do exactly the same thing; the Pandas-native versions just read closer to plain English.</p></blockquote>
+<h3 id="the-landsize-column">The Landsize Column</h3>
+<p>Whether it's safe to impute a numeric column instead of dropping its missing rows comes down to how spread out its values are. A tightly clustered column can be filled with something like its mean or median without distorting things much; a column with wild variance can't, because a single "typical" value doesn't represent much of anything.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Landsize&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</code></pre></div>
+<p>Here the spread is enormous — the standard deviation is close to the mean itself, and the maximum dwarfs the 75th percentile. Filling gaps with something like the mean would mean asserting a "typical" land size that most properties don't actually have, so the safer choice is to drop the missing rows instead:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Landsize&#39;</span><span class="p">])]</span>
+</code></pre></div>
+<h3 id="lattitude-and-longtitude">Lattitude and Longtitude</h3>
+<p>(Yes, both columns are misspelled in the source data — <code>Lattitude</code> and <code>Longtitude</code> — and that's worth keeping exactly as-is, since it's what the real column names are.) These two columns describe a single physical location together, so there's a good chance that whenever one is missing, the other is too:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># rows with Lattitude missing</span>
+<span class="n">data</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Lattitude&#39;</span><span class="p">])]</span>   <span class="c1"># confirms both Lattitude and Longtitude are missing together in the same rows</span>
+</code></pre></div>
+<p>With the pattern confirmed, check how tightly clustered these coordinates are before deciding how to fill them:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="p">[[</span><span class="s1">&#39;Lattitude&#39;</span><span class="p">,</span> <span class="s1">&#39;Longtitude&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</code></pre></div>
+<p>Unlike <code>Landsize</code>, geographic coordinates for properties concentrated in and around one city sit in a narrow, tight range — the standard deviation is small relative to the range of plausible values. That makes the column mean a reasonable, low-risk stand-in for the handful of missing rows:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Lattitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Lattitude&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Lattitude&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;Longtitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Longtitude&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Longtitude&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">round</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="car-and-bathroom-treating-counts-as-categories">Car and Bathroom: Treating Counts as Categories</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</code></pre></div>
+<p><code>Car</code> and <code>Bathroom</code> both show up as <code>float64</code>, which looks odd for something that's fundamentally a whole-number count — nobody has 1.3 bathrooms. The float dtype isn't hiding fractional bathrooms, though; it's simply what Pandas defaults to whenever a numeric column contains any missing values at all, since <code>NaN</code> itself is a floating-point value and integer columns can't hold it. The real, more useful reason to change these columns is different: a car count or bathroom count is a small set of discrete categories (0, 1, 2, 3...), not a continuous measurement, and it's more honest to treat it that way. Casting to <code>object</code> lets you reason about it with tools built for categories — <code>value_counts()</code>, and filling gaps with the single most common category (the mode) — rather than tools built for continuous numbers, like the mean:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Car&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Car&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;Bathroom&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Bathroom&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</code></pre></div>
+<p>Note that the cast alone doesn't change any values — <code>value_counts()</code> will still show <code>1.0</code>, <code>2.0</code>, and so on, since that's what the underlying numbers actually are. What's changed is how you're allowed to treat the column from here on.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Car&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</code></pre></div>
+<p>With the most common car count identified, fill the gaps in <code>Car</code> with it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Car&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Car&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Bathroom&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</code></pre></div>
+<p>And do the same for <code>Bathroom</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Bathroom&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Bathroom&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Bathroom&#39;</span><span class="p">]</span>
+</code></pre></div>
+<h3 id="dropna-in-practice">dropna() in Practice</h3>
+<p>Everything above filtered rows by hand with boolean masks, which is worth understanding at that level of detail — but Pandas' own <code>dropna()</code> covers the same ground more directly, with a few parameters worth knowing:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># drop any row that still has at least one missing value, anywhere</span>
+<span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+<span class="c1"># be more surgical: only require these specific columns to be non-null</span>
+<span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="s1">&#39;Landsize&#39;</span><span class="p">])</span>
+
+<span class="c1"># keep a row as long as it has at least this many real (non-missing) values</span>
+<span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">thresh</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+</code></pre></div>
+<p><code>subset</code> restricts which columns are even considered when deciding whether a row "has" a missing value, and <code>thresh</code> sets a minimum number of non-null values a row needs to survive, rather than requiring all of them. Both are usually gentler and more explicit than chaining boolean masks by hand once you know exactly what condition you want.</p>
+<h3 id="forward-fill-and-backward-fill">Forward Fill and Backward Fill</h3>
+<p>For time-ordered data specifically, there's a filling strategy that doesn't reach for a statistic at all: just carry the nearest known value across the gap. <code>ffill()</code> propagates the last valid value forward through any following gaps; <code>bfill()</code> does the mirror image, pulling the next valid value backward to fill the gaps before it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># Forward-fill: carry the last valid value forward</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
+
+<span class="c1"># Backward-fill: pull the next valid value backward</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">bfill</span><span class="p">()</span>
+</code></pre></div>
+<div class="diagram-card"><pre><code>   Price:     1017000    NaN     NaN     1209000    935000
+
+   ffill  →    1017000  1017000 1017000    1209000    935000   (carries left value right)
+   bfill  →    1017000  1209000 1209000    1209000    935000   (carries right value left)
+</code></pre></div>
+<p>These make sense for a genuine time series where "the value probably didn't change much since the last reading" is a fair assumption — a stock price, a sensor log, a running inventory count. They make much less sense for something like property price, shown above only to illustrate the mechanics; a house's price has no reason to resemble the price of whichever house happened to be listed next in the file.</p>
+<hr />
+<h2 id="part-5-smarter-imputation-knn-and-iterative"><span class="h-icon"><svg class="icon"><use href="#icon-puzzle"></use></svg></span>Part 5: Smarter Imputation — KNN and Iterative</h2>
+<p>Filling with a single number like the mean or the mode is fast, but it's also blind: every missing value in the column gets exactly the same fill, regardless of what else is true about that particular row. If a very large, five-bedroom property is missing its price, filling it with the dataset's overall average price ignores everything you actually know about that property. KNN and Iterative imputation both use the <em>other</em> columns to make a more informed guess.</p>
+<h3 id="knn-imputation">KNN Imputation</h3>
+<p><strong>K-Nearest Neighbors (KNN) imputation</strong> fills a missing value by finding the most similar rows — the "nearest neighbors" — based on the columns that <em>aren't</em> missing, and averaging their values for the column that is:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.impute</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNNImputer</span>
+<span class="n">knn_imputer</span> <span class="o">=</span> <span class="n">KNNImputer</span><span class="p">()</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">knn_imputer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="p">[[</span><span class="s1">&#39;Price&#39;</span><span class="p">]])</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+<blockquote><p>Fitting <code>KNNImputer</code> on a single column, as above, is a fine way to see the syntax, but it doesn't really use the "K nearest neighbors" idea to its potential — with only one feature to compare on, the "nearest" rows are just whichever prices happen to be numerically closest, which isn't so different from a rolling local average. KNN imputation earns its keep when you give it several relevant columns to judge similarity by, so that a missing price gets filled using genuinely comparable properties, not just nearby numbers:</p></blockquote>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">knn_imputer</span> <span class="o">=</span> <span class="n">KNNImputer</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">feature_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Rooms&#39;</span><span class="p">,</span> <span class="s1">&#39;Distance&#39;</span><span class="p">,</span> <span class="s1">&#39;Landsize&#39;</span><span class="p">,</span> <span class="s1">&#39;Price&#39;</span><span class="p">]</span>
+<span class="n">data</span><span class="p">[</span><span class="n">feature_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">knn_imputer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">feature_cols</span><span class="p">])</span>
+</code></pre></div>
+<p>Now a missing price is filled using the average price of the five most similar properties — similar in room count, distance from the city, and land size — rather than the single closest price value in isolation.</p>
+<h3 id="iterative-imputer">Iterative Imputer</h3>
+<p><strong>Iterative imputation</strong> goes a step further. Instead of comparing rows directly, it treats each column with missing values as something to <em>predict</em> from all the other columns, using a regression model. It fills in a first-pass guess for every gap, then goes column by column, re-predicting each one from the current (partly imputed) state of all the others, and repeats that cycle until the values stop changing much. This is the same idea behind the well-known MICE (Multiple Imputation by Chained Equations) method in statistics.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.experimental</span><span class="w"> </span><span class="kn">import</span> <span class="n">enable_iterative_imputer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.impute</span><span class="w"> </span><span class="kn">import</span> <span class="n">IterativeImputer</span>
+
+<span class="n">num_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Rooms&#39;</span><span class="p">,</span> <span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="s1">&#39;Distance&#39;</span><span class="p">,</span> <span class="s1">&#39;Bedroom2&#39;</span><span class="p">,</span> <span class="s1">&#39;Landsize&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Lattitude&#39;</span><span class="p">,</span> <span class="s1">&#39;Longtitude&#39;</span><span class="p">,</span> <span class="s1">&#39;Propertycount&#39;</span><span class="p">]</span>
+
+<span class="n">it_imputer</span> <span class="o">=</span> <span class="n">IterativeImputer</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="n">num_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">it_imputer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">num_cols</span><span class="p">])</span>
+</code></pre></div>
+<p>The <code>from sklearn.experimental import enable_iterative_imputer</code> line looks unused, but it isn't — <code>IterativeImputer</code> is still flagged as experimental in scikit-learn, so that import is what makes it available at all. Iterative imputation tends to outperform KNN when your columns are linearly related to each other (price genuinely does scale with rooms, distance, and land size here), but it's slower and, because it's fitting real regression models under the hood, easier to overfit if you hand it too many weakly related columns. Both are worth having in your toolkit; which one wins is usually worth checking empirically rather than assuming.</p>
+<hr />
+<h2 id="part-6-key-takeaways-for-missing-data"><span class="h-icon"><svg class="icon"><use href="#icon-key"></use></svg></span>Part 6: Key Takeaways for Missing Data</h2>
+<ul>
+<li>Don't reach for deletion by default. Dropping data means losing information, and past a certain point it leaves you with too little to trust your own conclusions.</li>
+<li>Deletion is safest when the data is genuinely <strong>MAR</strong> or <strong>MCAR</strong>, since the loss isn't tied to any particular kind of value — but even then, if the missing share is too large, deleting all of it still isn't free.</li>
+<li>If a column has low correlation with your other features and isn't important to the task, it's usually safe to drop outright.</li>
+<li>As a rule of thumb, keep the share of <strong>rows</strong> you delete under about 5% wherever you can — much more than that and you're meaningfully reshaping the dataset, not just tidying it.</li>
+<li>For <strong>columns</strong>, try to rescue a column before deleting it — but once more than roughly 60% of it is missing, filling it convincingly gets very hard, and dropping it becomes the more honest choice.</li>
+</ul>
+<hr />
+<h2 id="part-7-finding-and-removing-duplicate-rows"><span class="h-icon"><svg class="icon"><use href="#icon-dupe"></use></svg></span>Part 7: Finding and Removing Duplicate Rows</h2>
+<p>Duplicate rows creep in from merged files, repeated exports, or a form that got submitted twice. Left in place, they quietly double-count whatever they represent — inflating a total, or making one property look twice as common as it really is.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data_2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;melbourne.csv&#39;</span><span class="p">)</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data_2</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># Identify the duplicate rows</span>
+<span class="n">data_2</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</code></pre></div>
+<p><code>duplicated()</code> compares every row against all the ones before it and flags a row <code>True</code> the moment an identical row has already appeared. The first occurrence of any repeated row stays <code>False</code>; only the repeats after it are marked.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># check the rows which are duplicates</span>
+<span class="n">data_2</span><span class="p">[</span><span class="n">data_2</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()]</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># drop all the duplicate rows from the data</span>
+<span class="n">data_2</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p>You can also narrow the definition of "duplicate" to just a subset of columns, which is useful when two rows shouldn't both exist even if they differ in some incidental field:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data_2</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Price&#39;</span><span class="p">)</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># only consider certain columns for identifying duplicates, using the subset parameter</span>
+<span class="n">data_2</span><span class="p">[</span><span class="n">data_2</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Price&#39;</span><span class="p">)]</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># keeps the first row for each unique price, and drops the rest</span>
+<span class="n">data_2</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Price&#39;</span><span class="p">)</span>
+</code></pre></div>
+<blockquote><p>Worth being precise about what that last line actually does: it doesn't remove <em>every</em> row that shares its price with another. It keeps the first row for each distinct price and drops the ones that come after — the same "first occurrence survives" rule as plain <code>duplicated()</code>, just scoped to one column. In a real dataset with thousands of independent properties, two houses can easily and legitimately sell for the exact same price by coincidence, so <code>subset='Price'</code> is shown here purely to demonstrate the parameter — treating it as a real duplicate rule for this dataset would throw away plenty of perfectly valid, distinct sales.</p></blockquote>
+<hr />
+<h2 id="part-8-engineering-new-columns-from-existing-ones"><span class="h-icon"><svg class="icon"><use href="#icon-split"></use></svg></span>Part 8: Engineering New Columns from Existing Ones</h2>
+<p>Real datasets often cram several pieces of information into a single text column. Dates are the classic example: one <code>Date</code> field is really three separate, more useful pieces of information — day, month, and year — bundled together as text.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data_2</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div>
+<p>Suppose we want to split the date column into three new columns: day, month, and year. The first move, always, is to actually look at a value rather than assume its format:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data_2</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div>
+<p>The Melbourne dataset's <code>Date</code> column is formatted <code>day/month/year</code>, using a forward slash — something worth confirming before writing a single line of split logic, because the wrong delimiter won't throw an error at all. It'll just silently hand you back garbage:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># what happens if you guess the wrong delimiter?</span>
+<span class="n">data_2</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div>
+<div class="diagram-card"><pre><code>   Date value: &quot;7/12/2017&quot;     (no hyphen anywhere in it)
+
+   .str.split(&#x27;-&#x27;)  →  [&quot;7/12/2017&quot;]        a single-item list — nothing to split
+   .str.get(0)      →  &quot;7/12/2017&quot;          the WHOLE original string, unchanged
+   .str.get(1)      →  NaN                  there&#x27;s no second item to get
+   .str.get(2)      →  NaN                  there&#x27;s no third item either
+
+   Nothing crashes. &quot;day&quot; silently becomes a copy of the whole date,
+   and &quot;month&quot; / &quot;year&quot; silently become entirely NaN.
+</code></pre></div>
+<p>That's a much more dangerous kind of bug than a crash: the code runs cleanly, produces three new columns, and gives no indication that two of them are worthless. Splitting on the correct delimiter avoids it entirely:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data_2</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data_2</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_2</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">data_2</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_2</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">data_2</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_2</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">data_2</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div>
+<p><code>str.split('/')</code> turns each date string into a list of its three pieces, and <code>str.get(n)</code> pulls out the piece at position <code>n</code> — position 0 for the day, 1 for the month, 2 for the year, matching the <code>day/month/year</code> order the dates were written in. The general lesson carries well beyond dates: whenever you're about to split a text column, check an actual sample value first, rather than assuming the delimiter or the field order.</p>
+<hr />
+<h2 id="the-complete-data-wrangling-workflow-at-a-glance"><span class="h-icon"><svg class="icon"><use href="#icon-workflow"></use></svg></span>The Complete Data Wrangling Workflow at a Glance</h2>
+<p>Here's how all the pieces from this guide fit into a typical cleaning pass, start to finish:</p>
+<div class="workflow-card">
+  <div class="wf-head">The Complete Data Wrangling Workflow</div>
+  <div class="workflow-steps">
+    <div class="wf-step"><div class="wf-num">1</div><div class="wf-content"><strong>Diagnose</strong><code>.isnull().sum()</code> <code>.isnull().any()</code><br><span>Find out what's missing, where, and how much</span></div></div>
+    <div class="wf-step"><div class="wf-num">2</div><div class="wf-content"><strong>Classify</strong>Structural / MCAR / MAR / MNAR<br><span>Understand *why* it's missing before deciding what to do</span></div></div>
+    <div class="wf-step"><div class="wf-num">3</div><div class="wf-content"><strong>Decide: columns</strong><code>.drop(columns=[...])</code><br><span>Drop columns that are too sparse or unimportant to salvage</span></div></div>
+    <div class="wf-step"><div class="wf-num">4</div><div class="wf-content"><strong>Decide: rows</strong><code>.dropna()</code> <code>df[mask]</code><br><span>Drop rows that are too incomplete to trust</span></div></div>
+    <div class="wf-step"><div class="wf-num">5</div><div class="wf-content"><strong>Impute</strong><code>.fillna()</code> <code>KNNImputer</code> <code>IterativeImputer</code><br><span>Fill what's left, matching the method to the column's spread and importance</span></div></div>
+    <div class="wf-step"><div class="wf-num">6</div><div class="wf-content"><strong>Deduplicate</strong><code>.duplicated()</code> <code>.drop_duplicates()</code><br><span>Remove records that shouldn't be counted twice</span></div></div>
+    <div class="wf-step"><div class="wf-num">7</div><div class="wf-content"><strong>Reshape</strong><code>.str.split()</code> <code>.astype()</code><br><span>Turn messy text and mistyped columns into clean, usable fields</span></div></div>
+    <div class="wf-step"><div class="wf-num">8</div><div class="wf-content"><strong>Verify</strong><code>.info()</code> <code>.isnull().sum()</code><br><span>Confirm the dataset is actually clean before you build on it</span></div></div>
+  </div>
+</div>
+<hr />
+<h2 id="quick-reference-summary"><span class="h-icon"><svg class="icon"><use href="#icon-table"></use></svg></span>Quick Reference Summary</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr><th>Task</th><th>Code</th></tr>
+</thead>
+<tbody>
+<tr><td>Count missing per column</td><td><code>df.isnull().sum()</code></td></tr>
+<tr><td>Columns with any missing</td><td><code>df.columns[df.isnull().any()]</code></td></tr>
+<tr><td>Rows with any missing</td><td><code>df[df.isnull().any(axis=1)]</code></td></tr>
+<tr><td>Rows entirely missing</td><td><code>df[df.isnull().all(axis=1)]</code></td></tr>
+<tr><td>Percent missing per column</td><td><code>100*df.isnull().sum()/len(df)</code></td></tr>
+<tr><td>Drop specific columns</td><td><code>df.drop(columns=[...], inplace=True)</code></td></tr>
+<tr><td>Drop rows over a threshold of missing values</td><td><code>df[~(df.isnull().sum(axis=1) &gt; n)]</code></td></tr>
+<tr><td>Drop rows with any missing value</td><td><code>df.dropna()</code></td></tr>
+<tr><td>Drop rows missing specific columns</td><td><code>df.dropna(subset=[...])</code></td></tr>
+<tr><td>Keep rows with at least N real values</td><td><code>df.dropna(thresh=N)</code></td></tr>
+<tr><td>Fill with the column mean</td><td><code>df['col'].fillna(df['col'].mean())</code></td></tr>
+<tr><td>Fill with a constant / mode</td><td><code>df['col'].fillna(value)</code></td></tr>
+<tr><td>Forward / backward fill</td><td><code>df['col'].ffill()</code> / <code>df['col'].bfill()</code></td></tr>
+<tr><td>KNN imputation</td><td><code>KNNImputer().fit_transform(df[cols])</code></td></tr>
+<tr><td>Iterative imputation</td><td><code>IterativeImputer().fit_transform(df[cols])</code></td></tr>
+<tr><td>Change a column's dtype</td><td><code>df['col'].astype('object')</code></td></tr>
+<tr><td>Count duplicate rows</td><td><code>df.duplicated().sum()</code></td></tr>
+<tr><td>View duplicate rows</td><td><code>df[df.duplicated()]</code></td></tr>
+<tr><td>Drop duplicate rows</td><td><code>df.drop_duplicates()</code></td></tr>
+<tr><td>Duplicates on specific columns</td><td><code>df.duplicated(subset=[...])</code></td></tr>
+<tr><td>Split a text column</td><td><code>df['col'].str.split(delim)</code></td></tr>
+<tr><td>Pull one piece from a split</td><td><code>df['col'].str.split(delim).str.get(n)</code></td></tr>
+</tbody></table></div>
+<hr />
+<p>Data wrangling rarely feels like the interesting part of a project, but it's the part that everything else stands on. A model trained on unexamined missing-data assumptions, or an analysis built on rows that were secretly counted twice, produces a wrong answer that looks exactly like a right one. The habits in this guide (checking what's actually missing before touching it, matching your fix to the column's importance and spread, verifying a text column's real format before splitting it) are what keep that from happening.</p>
+
+      <div class="article-end">
+        <p><strong>Clean data is the foundation everything else in data science is built on.</strong> Once diagnosing, deciding, imputing, deduplicating, and reshaping feel like a routine you can run on any new dataset, you'll spend far less time doubting your own numbers later. Grab a messy CSV of your own and run through the eight-step workflow above — the habits matter far more than any single line of code.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="f-left">Python Data Science Series &nbsp;/&nbsp; Article 13 of the course</div>
+  <div class="f-right"><a href="#top">Back to top ↑</a></div>
+</footer>
+<script>
+(function(){
+  var t=document.getElementById('navToggle'),s=document.getElementById('sidebar');
+  if(t&&s){t.addEventListener('click',function(){s.classList.toggle('open');var o=s.classList.contains('open');t.innerHTML=o?'<svg class="icon"><use href="#icon-close"></use></svg>':'<svg class="icon"><use href="#icon-menu"></use></svg>';});s.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){s.classList.remove('open');t.innerHTML='<svg class="icon"><use href="#icon-menu"></use></svg>';});});}
+  var tl=Array.prototype.slice.call(document.querySelectorAll('.toc a')),sc=tl.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+  if('IntersectionObserver' in window&&sc.length){var bi={};tl.forEach(function(a){bi[a.getAttribute('href').slice(1)]=a;});var obs=new IntersectionObserver(function(es){es.forEach(function(e){var l=bi[e.target.id];if(!l)return;if(e.isIntersecting){tl.forEach(function(a){a.classList.remove('active');});l.classList.add('active');}});},{rootMargin:'-15% 0px -70% 0px',threshold:0});sc.forEach(function(s){obs.observe(s);});}
+  document.querySelectorAll('.code-card').forEach(function(c){var b=c.querySelector('.copy-btn'),e=c.querySelector('code');if(!b||!e)return;b.addEventListener('click',function(){var tx=e.innerText,done=function(){var o=b.innerHTML;b.innerHTML='<svg class="icon"><use href="#icon-check"></use></svg> Copied';setTimeout(function(){b.innerHTML=o;},1600);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(tx).then(done,done);else{var ta=document.createElement('textarea');ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(x){}document.body.removeChild(ta);done();}});});
+})();
+</script>
+</body>
+</html>
