@@ -1,0 +1,1611 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data Visualization with Matplotlib and Seaborn · Python Data Science Series</title>
+<meta name="description" content="A practical, visual guide to the most-used Matplotlib and Seaborn charts: what each one looks like, how it works, and when to reach for it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --paper:#F3F8FC;--surface:#FFFFFF;--tint:#E8F2FB;
+  --ink:#0E2238;--ink-soft:#3D5570;--ink-faint:#7F95AB;
+  --violet:#0B6FCC;--violet-deep:#0A4F9E;--violet-soft:#E2EFFB;
+  --pink:#3FA34D;--pink-text:#0A7466;--pink-soft:#E0F5F2;
+  --mint:#0FA3A3;--mint-text:#08787A;--mint-soft:#DDF4F4;
+  --sun:#FFB627;--sun-soft:#FFF4D9;
+  --orange:#E89B00;--orange-text:#9A6400;--orange-soft:#FFF0D1;
+  --sky:#013243;--sky-text:#013243;--sky-soft:#E1ECF0;
+  --line:#D6E4F0;--line-strong:#B9CFE3;
+  --code-bg:#0B1E33;--code-head:#08172A;--code-line:#17304D;--out-bg:#071425;
+  --r-s:8px;--r-m:14px;--r-l:22px;
+  --font-d:'Bricolage Grotesque','Arial Rounded MT Bold',sans-serif;
+  --font-b:'Figtree',-apple-system,'Segoe UI',sans-serif;
+  --font-m:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-b);font-size:17px;line-height:1.68;-webkit-font-smoothing:antialiased;}
+a{color:var(--violet-deep);text-decoration-color:rgba(11,111,204,.35);text-underline-offset:3px;text-decoration-thickness:2px;}
+a:hover{text-decoration-color:currentColor;}
+::selection{background:var(--pink);color:#fff;}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px;border-radius:4px;}
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.15em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+.shell{max-width:1300px;margin:0 auto;padding:0 clamp(16px,4vw,44px);}
+.topbar{display:none;position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;padding:12px clamp(16px,4vw,44px);background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:2px solid var(--violet-soft);}
+.topbar .brand{font-family:var(--font-d);font-weight:800;font-size:.98rem;color:var(--ink);}
+.topbar .brand span{color:var(--violet);}
+.topbar button{border:2px solid var(--violet-soft);background:var(--surface);border-radius:var(--r-s);width:40px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--violet);}
+
+/* ---------- Hero: the one loud moment ---------- */
+.hero{position:relative;margin:clamp(16px,2.5vw,28px) 0 clamp(36px,5vw,56px);padding:clamp(36px,5.5vw,68px) clamp(22px,4.5vw,60px);background:var(--violet);color:#fff;border-radius:var(--r-l);overflow:hidden;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,56px);align-items:center;}
+.hero::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:var(--violet-deep);right:-120px;top:-160px;}
+.hero::after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:var(--pink);left:-70px;bottom:-90px;opacity:.9;}
+.hero-copy,.hero-art{position:relative;z-index:1;}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-weight:600;font-size:.95rem;color:rgba(255,255,255,.86);margin-bottom:20px;}
+.hero-eyebrow .badge{background:var(--sun);color:var(--ink);font-family:var(--font-d);font-weight:800;padding:4px 13px;border-radius:999px;font-size:.92rem;}
+h1.title{font-family:var(--font-d);font-weight:800;font-size:clamp(2.15rem,4.6vw,3.7rem);line-height:1.02;letter-spacing:-.025em;margin:0 0 20px;max-width:16ch;color:#fff;}
+.hero-sub{font-size:clamp(1rem,1.5vw,1.12rem);color:rgba(255,255,255,.9);max-width:58ch;margin:0 0 28px;}
+.hero-sub strong{color:#fff;font-weight:700;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.28);padding:7px 14px 7px 10px;border-radius:999px;font-size:.88rem;font-weight:600;color:#fff;}
+.chip .icon{width:1.15em;height:1.15em;}
+.chip:nth-child(1) .icon{color:var(--sun);}
+.chip:nth-child(2) .icon{color:#7FF0D2;}
+.chip:nth-child(3) .icon{color:#C5F27A;}
+.chip:nth-child(4) .icon{color:#9FD6FF;}
+
+.hero-art{display:flex;flex-direction:column;align-items:center;}
+.blueprint{width:min(250px,100%);border:2.5px dashed rgba(255,255,255,.75);border-radius:var(--r-m);padding:14px 16px 12px;font-family:var(--font-m);font-size:.8rem;color:#fff;background:rgba(255,255,255,.06);}
+.bp-title{font-weight:700;margin-bottom:8px;}
+.bp-title .kw{color:#C5F27A;}
+.bp-title .cn{color:var(--sun);}
+.bp-line{padding:2px 0 2px 14px;color:rgba(255,255,255,.82);}
+.bp-line.m{color:#7FF0D2;}
+.fan{width:min(330px,100%);height:44px;display:block;}
+.fan path{stroke:rgba(255,255,255,.7);stroke-width:2;fill:none;stroke-dasharray:4 4;vector-effect:non-scaling-stroke;}
+.objs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(360px,100%);}
+.obj{border-radius:12px;padding:10px 10px 9px;font-family:var(--font-m);font-size:.72rem;line-height:1.5;color:var(--ink);box-shadow:0 6px 0 rgba(14,34,56,.28);animation:stamp .5s cubic-bezier(.3,1.5,.6,1) both;}
+.obj b{display:block;font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:3px;}
+.obj span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.o1{background:var(--sun);transform:rotate(-4deg);animation-delay:.25s;}
+.o2{background:#7FF0D2;transform:rotate(2deg);animation-delay:.45s;}
+.o3{background:#C5F27A;transform:rotate(-1.5deg);animation-delay:.65s;}
+@keyframes stamp{from{opacity:0;translate:0 -26px;scale:.85;}to{opacity:1;translate:0 0;scale:1;}}
+.art-cap{margin:18px 0 0;font-family:var(--font-d);font-weight:700;font-size:.95rem;color:rgba(255,255,255,.9);}
+
+/* ---------- Layout + sidebar ---------- */
+.layout{display:grid;grid-template-columns:265px minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start;padding-bottom:90px;}
+.sidebar{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;padding:16px 10px 16px 0;}
+.sidebar::-webkit-scrollbar{width:5px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px;}
+.toc-label{font-family:var(--font-d);font-weight:800;font-size:1rem;color:var(--ink);margin:0 0 10px;padding-left:12px;}
+.toc{list-style:none;margin:0;padding:0;}
+.toc li{margin:0 0 2px;}
+.toc a{display:flex;align-items:center;gap:10px;padding:7px 12px;font-size:.88rem;font-weight:500;color:var(--ink-soft);text-decoration:none;border-radius:10px;transition:background .15s,color .15s;}
+.toc a .icon{width:1.05em;height:1.05em;flex:none;color:var(--violet);}
+.toc a:hover{background:var(--violet-soft);color:var(--ink);}
+.toc a.active{background:var(--violet);color:#fff;font-weight:600;}
+.toc a.active .icon{color:var(--sun);}
+
+/* ---------- Article ---------- */
+.article{min-width:0;padding-top:8px;max-width:820px;}
+.article h2{--acc:var(--violet);font-family:var(--font-d);font-weight:800;font-size:clamp(1.55rem,2.6vw,2rem);line-height:1.15;letter-spacing:-.015em;margin:64px 0 18px;scroll-margin-top:24px;display:flex;align-items:center;gap:14px;}
+.article h2:nth-of-type(5n+2){--acc:var(--pink);}
+.article h2:nth-of-type(5n+3){--acc:var(--mint);}
+.article h2:nth-of-type(5n+4){--acc:var(--orange);}
+.article h2:nth-of-type(5n+5){--acc:var(--sky);}
+.article>h2:first-of-type{margin-top:4px;}
+.article>hr:first-child{display:none;}
+.article h2 .h-icon{width:2.6rem;height:2.6rem;flex:none;display:grid;place-items:center;background:var(--acc);color:#fff;border-radius:12px;transform:rotate(-4deg);box-shadow:0 4px 0 rgba(14,34,56,.18);}
+.article h2 .h-icon .icon{width:1.35rem;height:1.35rem;stroke-width:2;}
+.article h3{font-family:var(--font-d);font-weight:700;font-size:1.2rem;margin:34px 0 10px;scroll-margin-top:24px;color:var(--ink);}
+.article p{margin:0 0 17px;}
+.article ul,.article ol{margin:0 0 20px;padding-left:1.35em;}
+.article li{margin-bottom:8px;padding-left:.2em;}
+.article ul li::marker{color:var(--pink);font-size:1.15em;}
+.article ol li::marker{color:var(--violet);font-family:var(--font-d);font-weight:800;}
+.article strong{font-weight:700;}
+.article hr{border:0;height:6px;width:110px;margin:52px auto;border-radius:6px;background:linear-gradient(90deg,var(--violet) 0 20%,var(--pink) 20% 40%,var(--mint) 40% 60%,var(--sun) 60% 80%,var(--sky) 80% 100%);}
+.article code{font-family:var(--font-m);font-size:.84em;background:var(--pink-soft);padding:.12em .4em;border-radius:6px;color:var(--pink-text);}
+.article blockquote{margin:22px 0;padding:16px 20px;border-left:5px solid var(--sun);background:var(--sun-soft);border-radius:0 var(--r-m) var(--r-m) 0;color:var(--ink);}
+.article blockquote p{margin:0;color:inherit;}
+
+.table-wrap{overflow-x:auto;margin:22px 0 28px;border-radius:var(--r-m);border:2px solid var(--violet-soft);background:var(--surface);}
+.article table{width:100%;border-collapse:collapse;font-size:.9rem;}
+.article thead th{background:var(--violet);color:#fff;font-family:var(--font-d);font-weight:700;text-align:left;padding:12px 16px;white-space:nowrap;font-size:.9rem;}
+.article tbody td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top;}
+.article tbody tr:last-child td{border-bottom:none;}
+.article tbody tr:nth-child(even){background:#F5F9FD;}
+.article tbody td code{white-space:nowrap;}
+
+/* ---------- Code ---------- */
+.code-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;background:var(--code-bg);box-shadow:0 6px 0 var(--violet-soft);}
+.code-card .code-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--code-head);border-bottom:1px solid var(--code-line);}
+.code-card .dots{display:flex;gap:6px;}
+.code-card .dots span{width:10px;height:10px;border-radius:50%;display:block;}
+.code-card .dots span:nth-child(1){background:var(--pink);}
+.code-card .dots span:nth-child(2){background:var(--sun);}
+.code-card .dots span:nth-child(3){background:var(--mint);}
+.code-card .lang{font-family:var(--font-m);font-size:.72rem;color:#7E9CC0;}
+.code-card .copy-btn{font-family:var(--font-b);font-weight:600;font-size:.76rem;color:#DCEBFA;background:rgba(255,255,255,.06);border:1px solid #23456B;border-radius:7px;padding:4px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s,border-color .15s;}
+.code-card .copy-btn:hover{background:var(--violet);border-color:var(--violet);color:#fff;}
+.code-card .copy-btn .icon{width:.95em;height:.95em;}
+.code-card pre{margin:0;padding:16px 20px;overflow-x:auto;font-size:.85rem;line-height:1.6;}
+.code-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#E6F1FF;background:none;padding:0;border-radius:0;}
+.code-card .k,.code-card .kn,.code-card .kd,.code-card .kc,.code-card .ow{color:#5CC8FF;}
+.code-card .nb,.code-card .bp{color:#9FD6FF;}
+.code-card .nf,.code-card .fm{color:#A6E36B;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa,.code-card .sd,.code-card .se{color:#FFD166;}
+.code-card .si{color:#6EE7D8;}
+.code-card .mi,.code-card .mf{color:#6EE7D8;}
+.code-card .o,.code-card .p{color:#9FB6CF;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#6F8BA8;font-style:italic;}
+.code-card .n{color:#E6F1FF;}
+.code-card .nc,.code-card .ne{color:#FFB86B;font-weight:600;}
+
+.output-card{margin:-26px 0 26px;border-radius:0 0 var(--r-m) var(--r-m);overflow:hidden;background:var(--out-bg);border-top:2px dashed #23456B;box-shadow:0 6px 0 var(--violet-soft);position:relative;z-index:1;}
+.output-card::before{content:"Output";display:block;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:#A6E36B;padding:9px 20px 0;}
+.output-card pre{margin:0;padding:4px 20px 16px;overflow-x:auto;font-size:.82rem;line-height:1.6;}
+.output-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#BFD6EE;background:none;padding:0;border-radius:0;}
+
+.diagram-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;position:relative;border:2.5px dashed var(--line-strong);background:var(--surface);}
+.diagram-card::before{content:"diagram";position:absolute;top:10px;right:14px;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:var(--violet);}
+.diagram-card pre{margin:0;padding:26px 22px 20px;overflow-x:auto;}
+.diagram-card pre{line-height:1.3;font-size:.84rem;}
+.diagram-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:var(--violet-deep);font-weight:500;background:none;padding:0;white-space:pre;}
+
+.svg-diagram{margin:24px 0 28px;padding:22px 20px 18px;background:var(--surface);border:2px solid var(--violet-soft);border-radius:var(--r-m);}
+.svg-diagram{overflow-x:auto;}
+.svg-diagram svg{width:100%;min-width:560px;height:auto;display:block;}
+.svg-diagram .cap{font-size:.86rem;font-weight:500;color:var(--ink-faint);text-align:center;margin-top:12px;}
+
+.article-end{margin-top:56px;padding:30px 30px;border-radius:var(--r-l);background:var(--violet);color:#fff;position:relative;overflow:hidden;}
+.article-end::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:var(--sun);right:-50px;bottom:-60px;}
+.article-end p{margin:0;font-size:1.06rem;color:rgba(255,255,255,.92);position:relative;z-index:1;max-width:62ch;}
+.article-end p strong{color:#fff;}
+
+footer.site-footer{border-top:2px solid var(--violet-soft);margin-top:30px;padding:22px clamp(16px,4vw,44px) 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer.site-footer .f-left{font-size:.88rem;font-weight:500;color:var(--ink-faint);}
+footer.site-footer a{font-size:.9rem;font-weight:600;}
+
+@media(max-width:960px){
+  .topbar{display:flex;}
+  .layout{grid-template-columns:1fr;}
+  .article{max-width:none;}
+  .sidebar{position:fixed;inset:60px 0 0 0;z-index:35;background:var(--paper);padding:18px clamp(16px,4vw,44px) 24px;transform:translateX(-100%);transition:transform .2s;max-height:none;height:calc(100vh - 60px);}
+  .sidebar.open{transform:translateX(0);}
+  .hero{grid-template-columns:1fr;}
+}
+@media(max-width:520px){
+  .article h2 .h-icon{width:2.2rem;height:2.2rem;}
+  .obj{font-size:.66rem;padding:9px 8px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}.obj{animation:none;}}
+
+/* NumPy hero illustration */
+.cells{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid rgba(255,255,255,.8);border-radius:8px;overflow:hidden;margin-top:4px;}
+.cells span{text-align:center;padding:7px 0;font-weight:700;color:#fff;}
+.cells span+span{border-left:2px solid rgba(255,255,255,.8);}
+.objs.four{grid-template-columns:repeat(4,1fr);width:min(380px,100%);gap:9px;}
+.objs.four .obj{text-align:center;padding:10px 4px 9px;}
+.o4{background:#9FD6FF;transform:rotate(3deg);animation-delay:.85s;}
+
+/* Article 13 extras */
+.chip:nth-child(5) .icon{color:var(--sun);}
+.toc-group-label{font-family:var(--font-d);font-weight:700;font-size:.8rem;color:var(--ink-faint);padding:14px 12px 4px;list-style:none;}
+.article h3.use-yes,.article h3.use-no{display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 11px;border-radius:999px;font-size:1rem;}
+.article h3.use-yes{background:var(--mint-soft);color:var(--mint-text);}
+.article h3.use-no{background:var(--orange-soft);color:var(--orange-text);}
+.article h3.use-yes .icon,.article h3.use-no .icon{width:1.05em;height:1.05em;flex:none;}
+.article blockquote.warn{border-left-color:var(--orange);background:var(--orange-soft);}
+.cells.five{grid-template-columns:repeat(5,1fr);}
+.cells.five span{font-size:.74rem;padding:6px 0;}
+.obj.mini{text-align:center;padding:8px 6px 8px;}
+.obj.mini svg{width:100%;height:46px;display:block;margin:2px 0 4px;}
+.obj.mini svg *{stroke:var(--ink);fill:none;stroke-width:2;}
+.obj.mini svg rect,.obj.mini svg circle{fill:var(--ink);stroke:none;}
+.obj.mini b{font-size:.9rem;margin:0;}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true">
+<defs>
+
+<symbol id="icon-line" viewBox="0 0 24 24">
+  <polyline points="3,17 8,10 13,13 19,5"/>
+  <circle cx="3" cy="17" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="8" cy="10" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="13" cy="13" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="19" cy="5" r="1.3" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="icon-bar" viewBox="0 0 24 24">
+  <rect x="3" y="14" width="3.2" height="6" fill="currentColor" stroke="none"/>
+  <rect x="8.6" y="8" width="3.2" height="12" fill="currentColor" stroke="none"/>
+  <rect x="14.2" y="11" width="3.2" height="9" fill="currentColor" stroke="none"/>
+  <rect x="19.8" y="5" width="3.2" height="15" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="icon-scatter" viewBox="0 0 24 24">
+  <circle cx="4" cy="17" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="7" cy="9" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="10" cy="15" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="13" cy="6" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="16" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="19" cy="8" r="1.3" fill="currentColor" stroke="none"/>
+  <circle cx="11" cy="19" r="1.3" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="icon-histogram" viewBox="0 0 24 24">
+  <rect x="2" y="17" width="3.2" height="3" fill="currentColor" stroke="none"/>
+  <rect x="5.2" y="12" width="3.2" height="8" fill="currentColor" stroke="none"/>
+  <rect x="8.4" y="7" width="3.2" height="13" fill="currentColor" stroke="none"/>
+  <rect x="11.6" y="9" width="3.2" height="11" fill="currentColor" stroke="none"/>
+  <rect x="14.8" y="14" width="3.2" height="6" fill="currentColor" stroke="none"/>
+  <rect x="18" y="17" width="3.2" height="3" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="icon-box" viewBox="0 0 24 24">
+  <line x1="12" y1="2" x2="12" y2="7"/>
+  <rect x="7" y="7" width="10" height="9"/>
+  <line x1="7" y1="11.5" x2="17" y2="11.5"/>
+  <line x1="12" y1="16" x2="12" y2="21"/>
+</symbol>
+
+<symbol id="icon-heatmap" viewBox="0 0 24 24">
+  <rect x="2" y="2" width="6" height="6" rx="1" fill="currentColor" stroke="none" opacity="1"/>
+  <rect x="9" y="2" width="6" height="6" rx="1" fill="currentColor" stroke="none" opacity=".28"/>
+  <rect x="16" y="2" width="6" height="6" rx="1" fill="currentColor" stroke="none" opacity=".6"/>
+  <rect x="2" y="9" width="6" height="6" rx="1" fill="currentColor" stroke="none" opacity=".28"/>
+  <rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" stroke="none" opacity="1"/>
+  <rect x="16" y="9" width="6" height="6" rx="1" fill="currentColor" stroke="none" opacity=".45"/>
+  <rect x="2" y="16" width="6" height="6" rx="1" fill="currentColor" stroke="none" opacity=".6"/>
+  <rect x="9" y="16" width="6" height="6" rx="1" fill="currentColor" stroke="none" opacity=".45"/>
+  <rect x="16" y="16" width="6" height="6" rx="1" fill="currentColor" stroke="none" opacity="1"/>
+</symbol>
+
+<symbol id="icon-pairplot" viewBox="0 0 24 24">
+  <rect x="2" y="2" width="20" height="20" rx="1.5"/>
+  <line x1="8.7" y1="2" x2="8.7" y2="22"/>
+  <line x1="15.3" y1="2" x2="15.3" y2="22"/>
+  <line x1="2" y1="8.7" x2="22" y2="8.7"/>
+  <line x1="2" y1="15.3" x2="22" y2="15.3"/>
+  <circle cx="5.3" cy="18.6" r="1" fill="currentColor" stroke="none"/>
+  <circle cx="7" cy="19.5" r="1" fill="currentColor" stroke="none"/>
+  <circle cx="18.6" cy="5.3" r="1" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="icon-subplots" viewBox="0 0 24 24">
+  <rect x="2" y="2" width="9" height="9" rx="1.3"/>
+  <rect x="13" y="2" width="9" height="9" rx="1.3"/>
+  <rect x="2" y="13" width="9" height="9" rx="1.3"/>
+  <rect x="13" y="13" width="9" height="9" rx="1.3"/>
+</symbol>
+
+<symbol id="icon-strip" viewBox="0 0 24 24">
+  <circle cx="12" cy="3" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="9" cy="6.5" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="15" cy="6.5" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="7.5" cy="10" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="16.5" cy="10" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="7.5" cy="14" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="16.5" cy="14" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="9" cy="17.5" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="15" cy="17.5" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="12" cy="21" r="1.2" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="icon-joint" viewBox="0 0 24 24">
+  <rect x="2" y="2" width="3" height="2.6" fill="currentColor" stroke="none"/>
+  <rect x="6" y="1" width="3" height="3.6" fill="currentColor" stroke="none"/>
+  <rect x="10" y="2.6" width="3" height="2" fill="currentColor" stroke="none"/>
+  <rect x="19.4" y="8" width="2.6" height="3" fill="currentColor" stroke="none"/>
+  <rect x="18.4" y="12" width="3.6" height="3" fill="currentColor" stroke="none"/>
+  <rect x="20" y="16" width="2" height="3" fill="currentColor" stroke="none"/>
+  <circle cx="6" cy="14" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="9.5" cy="9" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="12.5" cy="13" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="7.5" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="11" cy="16.5" r="1.2" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="icon-facet" viewBox="0 0 24 24">
+  <rect x="1.5" y="6" width="6" height="13"/>
+  <rect x="9" y="6" width="6" height="13"/>
+  <rect x="16.5" y="6" width="6" height="13"/>
+  <circle cx="4.5" cy="13.5" r="1" fill="currentColor" stroke="none"/>
+  <circle cx="12" cy="10.5" r="1" fill="currentColor" stroke="none"/>
+  <circle cx="19.5" cy="15" r="1" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="icon-pie" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="9.3"/>
+  <line x1="12" y1="12" x2="12" y2="2.7"/>
+  <line x1="12" y1="12" x2="4.2" y2="16.5"/>
+  <line x1="12" y1="12" x2="19.8" y2="16.5"/>
+</symbol>
+
+<symbol id="icon-guide" viewBox="0 0 24 24">
+  <line x1="12" y1="3" x2="12" y2="8"/>
+  <line x1="12" y1="8" x2="6" y2="15"/>
+  <line x1="12" y1="8" x2="18" y2="15"/>
+  <line x1="6" y1="15" x2="3" y2="20"/>
+  <line x1="6" y1="15" x2="9" y2="20"/>
+  <circle cx="12" cy="8" r="1.4" fill="currentColor" stroke="none"/>
+  <circle cx="6" cy="15" r="1.4" fill="currentColor" stroke="none"/>
+  <circle cx="18" cy="15" r="1.4" fill="currentColor" stroke="none"/>
+  <circle cx="3" cy="20" r="1.2" fill="currentColor" stroke="none"/>
+  <circle cx="9" cy="20" r="1.2" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="icon-style" viewBox="0 0 24 24">
+  <circle cx="7" cy="13" r="4" fill="currentColor" stroke="none" opacity=".55"/>
+  <circle cx="13" cy="8" r="4" fill="currentColor" stroke="none" opacity=".75"/>
+  <circle cx="16" cy="15" r="4" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="icon-workflow" viewBox="0 0 24 24">
+  <rect x="3" y="4" width="4.5" height="4.5" rx="1"/>
+  <path d="M4.2 6.3 L5.6 7.6 L7.3 5.2" stroke-width="1.4"/>
+  <rect x="3" y="10.2" width="4.5" height="4.5" rx="1"/>
+  <rect x="3" y="16.4" width="4.5" height="4.5" rx="1"/>
+  <line x1="10.3" y1="6.25" x2="21" y2="6.25"/>
+  <line x1="10.3" y1="12.45" x2="21" y2="12.45"/>
+  <line x1="10.3" y1="18.65" x2="21" y2="18.65"/>
+</symbol>
+
+<symbol id="icon-table" viewBox="0 0 24 24">
+  <rect x="2" y="3" width="20" height="18" rx="1.5"/>
+  <line x1="2" y1="9" x2="22" y2="9"/>
+  <line x1="9" y1="3" x2="9" y2="21"/>
+  <line x1="15.5" y1="3" x2="15.5" y2="21"/>
+</symbol>
+
+<symbol id="icon-frame" viewBox="0 0 24 24">
+  <line x1="4" y1="2" x2="4" y2="20"/>
+  <line x1="4" y1="20" x2="22" y2="20"/>
+  <line x1="4" y1="6" x2="6" y2="6"/>
+  <line x1="4" y1="12" x2="6" y2="12"/>
+  <line x1="9" y1="18" x2="9" y2="20"/>
+  <line x1="15" y1="18" x2="15" y2="20"/>
+  <polyline points="6,15 10,9 14,12 20,4" opacity=".7"/>
+</symbol>
+
+<symbol id="icon-layers" viewBox="0 0 24 24">
+  <rect x="4" y="3" width="14" height="10" rx="1.5"/>
+  <rect x="6.5" y="10.5" width="14" height="10" rx="1.5" fill="var(--bg,#EFF3F7)"/>
+  <rect x="6.5" y="10.5" width="14" height="10" rx="1.5"/>
+</symbol>
+
+<symbol id="icon-check" viewBox="0 0 24 24">
+  <path d="M4 12.5 L9.5 18 L20 5"/>
+</symbol>
+
+<symbol id="icon-warn" viewBox="0 0 24 24">
+  <path d="M12 3 L22 20 L2 20 Z"/>
+  <line x1="12" y1="9" x2="12" y2="14"/>
+  <circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="icon-copy" viewBox="0 0 24 24">
+  <rect x="8" y="8" width="12" height="13" rx="1.6"/>
+  <path d="M5 16H4.5A1.5 1.5 0 0 1 3 14.5v-10A1.5 1.5 0 0 1 4.5 3h10A1.5 1.5 0 0 1 16 4.5V5"/>
+</symbol>
+
+<symbol id="icon-menu" viewBox="0 0 24 24">
+  <line x1="3" y1="6" x2="21" y2="6"/>
+  <line x1="3" y1="12" x2="21" y2="12"/>
+  <line x1="3" y1="18" x2="21" y2="18"/>
+</symbol>
+
+<symbol id="icon-close" viewBox="0 0 24 24">
+  <line x1="5" y1="5" x2="19" y2="19"/>
+  <line x1="19" y1="5" x2="5" y2="19"/>
+</symbol>
+
+<symbol id="icon-code" viewBox="0 0 24 24">
+  <polyline points="8,7 3,12 8,17"/>
+  <polyline points="16,7 21,12 16,17"/>
+  <line x1="14" y1="4" x2="10" y2="20"/>
+</symbol>
+
+<symbol id="icon-search" viewBox="0 0 24 24">
+  <circle cx="10.5" cy="10.5" r="7"/>
+  <line x1="15.8" y1="15.8" x2="21" y2="21"/>
+</symbol>
+
+</defs>
+</svg>
+
+<div class="topbar">
+  <span class="brand">§13 &nbsp;<span>Data Visualization</span></span>
+  <button id="navToggle" aria-label="Toggle navigation">
+    <svg class="icon"><use href="#icon-menu"></use></svg>
+  </button>
+</div>
+
+<div class="shell" id="top">
+  <section class="hero">
+  <div class="hero-copy">
+    <div class="hero-eyebrow"><span class="badge">Article 13</span> Python Data Science Series</div>
+    <h1 class="title">Data Visualization with Matplotlib and Seaborn: A Practical Guide</h1>
+    <p class="hero-sub">Numbers in a spreadsheet are like facts locked in a filing cabinet. They exist, but they don't tell you anything on their own. Data visualization is what turns those numbers into pictures, and pictures are where the patterns, outliers, and trends actually become visible. It's the tool a data scientist reaches for most, both to understand data and to explain it to someone else.</p>
+    <div class="hero-chips">
+      <div class="chip"><svg class="icon"><use href="#icon-line"></use></svg> 11 chart types, one at a time</div>
+      <div class="chip"><svg class="icon"><use href="#icon-code"></use></svg> Copy-paste ready code</div>
+      <div class="chip"><svg class="icon"><use href="#icon-guide"></use></svg> When to use each</div>
+      <div class="chip"><svg class="icon"><use href="#icon-style"></use></svg> Styling &amp; palettes</div>
+      <div class="chip"><svg class="icon"><use href="#icon-workflow"></use></svg> A real workflow, start to finish</div>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="blueprint">
+      <div class="bp-title"><span class="cn">sales</span> <span class="kw">=</span> [...]</div>
+      <div class="cells five"><span>300</span><span>450</span><span>380</span><span>420</span><span>500</span></div>
+    </div>
+    <svg class="fan" viewBox="0 0 330 44" preserveAspectRatio="none"><path d="M165 0 C165 24 55 18 55 44"/><path d="M165 0 L165 44"/><path d="M165 0 C165 24 275 18 275 44"/></svg>
+    <div class="objs">
+      <div class="obj mini o1"><svg viewBox="0 0 60 40"><rect x="4" y="22" width="8" height="18"/><rect x="16" y="9" width="8" height="31"/><rect x="28" y="15" width="8" height="25"/><rect x="40" y="12" width="8" height="28"/><rect x="52" y="4" width="8" height="36"/></svg><b>bar</b></div>
+      <div class="obj mini o2"><svg viewBox="0 0 60 40"><polyline points="4,30 16,17 28,23 40,20 56,6"/></svg><b>line</b></div>
+      <div class="obj mini o3"><svg viewBox="0 0 60 40"><circle cx="8" cy="32" r="3"/><circle cx="18" cy="26" r="3"/><circle cx="26" cy="29" r="3"/><circle cx="34" cy="18" r="3"/><circle cx="44" cy="14" r="3"/><circle cx="54" cy="7" r="3"/></svg><b>scatter</b></div>
+    </div>
+    <p class="art-cap">One dataset, many pictures</p>
+  </div>
+</section>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="toc-label">On this page</div>
+      <ul class="toc">
+<li><a href="#the-relationship-between-matplotlib-and-seaborn"><svg class="icon"><use href="#icon-layers"></use></svg><span>The Relationship Between Matplotlib and Seaborn</span></a></li>
+<li><a href="#the-anatomy-of-a-matplotlib-figure"><svg class="icon"><use href="#icon-frame"></use></svg><span>The Anatomy of a Matplotlib Figure</span></a></li>
+<li class="toc-group-label">Chart types</li>
+<li><a href="#chart-1-line-plot-tracking-change-over-time"><svg class="icon"><use href="#icon-line"></use></svg><span>Chart 1: Line Plot, Tracking Change Over Time</span></a></li>
+<li><a href="#chart-2-bar-chart-comparing-categories-side-by-side"><svg class="icon"><use href="#icon-bar"></use></svg><span>Chart 2: Bar Chart, Comparing Categories Side by Side</span></a></li>
+<li><a href="#chart-3-scatter-plot-finding-relationships-between-two-variables"><svg class="icon"><use href="#icon-scatter"></use></svg><span>Chart 3: Scatter Plot, Finding Relationships Between Two Variables</span></a></li>
+<li><a href="#chart-4-histogram-seeing-the-shape-of-your-data"><svg class="icon"><use href="#icon-histogram"></use></svg><span>Chart 4: Histogram, Seeing the Shape of Your Data</span></a></li>
+<li><a href="#chart-5-box-plot-for-distribution-spread-and-outliers"><svg class="icon"><use href="#icon-box"></use></svg><span>Chart 5: Box Plot for Distribution, Spread, and Outliers</span></a></li>
+<li><a href="#chart-6-heatmap-visualizing-a-matrix-of-numbers"><svg class="icon"><use href="#icon-heatmap"></use></svg><span>Chart 6: Heatmap, Visualizing a Matrix of Numbers</span></a></li>
+<li><a href="#chart-7-pairplot-exploring-all-relationships-at-once"><svg class="icon"><use href="#icon-pairplot"></use></svg><span>Chart 7: Pairplot, Exploring All Relationships at Once</span></a></li>
+<li><a href="#chart-8-subplots-multiple-charts-in-one-figure"><svg class="icon"><use href="#icon-subplots"></use></svg><span>Chart 8: Subplots, Multiple Charts in One Figure</span></a></li>
+<li><a href="#chart-9-strip-plot-and-swarm-plot-showing-every-individual-data-point"><svg class="icon"><use href="#icon-strip"></use></svg><span>Chart 9: Strip Plot and Swarm Plot, Showing Every Individual Data Point</span></a></li>
+<li><a href="#chart-10-joint-plot-scatter-and-distribution-in-one"><svg class="icon"><use href="#icon-joint"></use></svg><span>Chart 10: Joint Plot, Scatter and Distribution in One</span></a></li>
+<li><a href="#chart-11-facetgrid-the-same-chart-for-every-category"><svg class="icon"><use href="#icon-facet"></use></svg><span>Chart 11: FacetGrid, the Same Chart for Every Category</span></a></li>
+<li class="toc-group-label">Putting it to work</li>
+<li><a href="#choosing-the-right-chart-a-decision-guide"><svg class="icon"><use href="#icon-guide"></use></svg><span>Choosing the Right Chart: A Decision Guide</span></a></li>
+<li><a href="#styling-your-charts-making-them-look-professional"><svg class="icon"><use href="#icon-style"></use></svg><span>Styling Your Charts: Making Them Look Professional</span></a></li>
+<li><a href="#putting-it-all-together-a-real-data-science-workflow"><svg class="icon"><use href="#icon-workflow"></use></svg><span>Putting It All Together: A Real Data Science Workflow</span></a></li>
+<li><a href="#quick-reference-summary"><svg class="icon"><use href="#icon-table"></use></svg><span>Quick Reference Summary</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="article">
+<p>This guide covers the charts you'll actually use day to day, not every visualization that exists, just the ones that answer most real business questions. For each one, you'll see what it looks like (as a text diagram, not code), what it's for, and when to use it or leave it alone. Two libraries do the work here. Matplotlib is the underlying engine. Seaborn sits on top of it and gives you good-looking, statistically aware charts with a lot less code.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+</code></pre></div>
+
+<hr />
+<h2 id="the-relationship-between-matplotlib-and-seaborn"><span class="h-icon"><svg class="icon"><use href="#icon-layers"></use></svg></span>The Relationship Between Matplotlib and Seaborn</h2>
+<p>Before the charts, here's the one thing worth understanding: these two libraries aren't alternatives. One sits on top of the other.</p>
+<div class="diagram-card"><pre><code>   ┌───────────────────────────────────────────────┐
+   │                   SEABORN                     │
+   │   "Give me a heatmap" → writes the Matplotlib │
+   │    code for you, with better defaults          │
+   ├───────────────────────────────────────────────┤
+   │                 MATPLOTLIB                    │
+   │   The engine: every line, label, colour,      │
+   │   and tick mark ultimately lives here         │
+   └───────────────────────────────────────────────┘
+</code></pre></div>
+
+<p>Matplotlib is baking from scratch: you control every ingredient. Seaborn is a baking mix: it handles the tedious parts (colour palettes, grid styles, error bars) and adds statistical features automatically, though the oven underneath is still Matplotlib. You can mix the two freely, and the best code usually does.</p>
+<hr />
+<h2 id="the-anatomy-of-a-matplotlib-figure"><span class="h-icon"><svg class="icon"><use href="#icon-frame"></use></svg></span>The Anatomy of a Matplotlib Figure</h2>
+<p>Every chart, regardless of type, is built from the same two core objects:</p>
+<ul>
+<li>A <strong>Figure</strong> is the entire canvas, the outer box.</li>
+<li>An <strong>Axes</strong> is the actual plot area inside that canvas, where the chart itself lives.</li>
+</ul>
+<div class="diagram-card"><pre><code>   FIGURE  (the whole canvas)
+   ┌──────────────────────────────────────────────┐
+   │  ┌────────────────────────────────────────┐  │
+   │  │  AXES            Title          legend │  │
+   │  │         │   ●          ●               │  │
+   │  │ ylabel  │      ●   ●                   │  │
+   │  │         │              ●               │  │
+   │  │         └──────────────────── x-axis   │  │
+   │  │                  xlabel                │  │
+   │  └────────────────────────────────────────┘  │
+   └──────────────────────────────────────────────┘
+</code></pre></div>
+
+<p>The cleanest way to create both, and the one that gives you full control:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>   <span class="c1"># canvas 10 inches wide, 6 tall</span>
+</code></pre></div>
+
+<p>Everything you call after this (<code>ax.set_title(...)</code>, <code>ax.set_xlabel(...)</code>, <code>ax.plot(...)</code>) draws onto that axes object. The title, axis labels, ticks and legend all belong to the Axes, which is why they're set through <code>ax</code>.</p>
+<hr />
+<h2 id="chart-1-line-plot-tracking-change-over-time"><span class="h-icon"><svg class="icon"><use href="#icon-line"></use></svg></span>Chart 1: Line Plot, Tracking Change Over Time</h2>
+<h3 id="what-it-looks-like">What it looks like</h3>
+<div class="diagram-card"><pre><code>   Revenue ($M)
+    50 │                                ●
+    40 │                           ●
+    30 │                      ●
+    20 │            ●    ●
+    10 │  ●    ●
+       └─────────────────────────────────────
+         Jan  Feb  Mar  Apr  May  Jun  Jul
+</code></pre></div>
+
+<h3 id="the-code">The Code</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">months</span>  <span class="o">=</span> <span class="p">[</span><span class="s2">"Jan"</span><span class="p">,</span> <span class="s2">"Feb"</span><span class="p">,</span> <span class="s2">"Mar"</span><span class="p">,</span> <span class="s2">"Apr"</span><span class="p">,</span> <span class="s2">"May"</span><span class="p">,</span> <span class="s2">"Jun"</span><span class="p">,</span> <span class="s2">"Jul"</span><span class="p">]</span>
+<span class="n">revenue</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">months</span><span class="p">,</span> <span class="n">revenue</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'steelblue'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Monthly Revenue | Netflix India"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Month"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Revenue ($M)"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+
+<h3 id="when-to-use-it" class="use-yes"><span class="icon"><svg class="icon"><use href="#icon-check"></use></svg></span>When to Use It</h3>
+<p>A line plot assumes the x-axis is ordered and continuous, usually time. It's the chart for any "how did this change over time" question.</p>
+<ul>
+<li>Netflix tracking daily active users over a quarter</li>
+<li>Spotify charting weekly stream counts for a new release</li>
+<li>Swiggy monitoring hourly order volumes during a festival</li>
+<li>Tesla plotting quarterly production output over two years</li>
+</ul>
+<h3 id="when-not-to-use-it" class="use-no"><span class="icon"><svg class="icon"><use href="#icon-warn"></use></svg></span>When <em>Not</em> to Use It</h3>
+<p>Skip the line plot if your x-axis is categories with no natural order, like city names or product categories. Connecting them with a line implies a trend that isn't there. Use a bar chart instead.</p>
+<h3 id="seaborn-version">Seaborn Version</h3>
+<p>Seaborn's <code>lineplot</code> adds confidence intervals automatically. It shows the average and the uncertainty around it, which is genuinely useful once you have repeated measurements:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"month"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"revenue"</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">"region"</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The <code>hue</code> parameter splits one line into multiple lines, one per category, and generates a legend automatically.</p>
+<hr />
+<h2 id="chart-2-bar-chart-comparing-categories-side-by-side"><span class="h-icon"><svg class="icon"><use href="#icon-bar"></use></svg></span>Chart 2: Bar Chart, Comparing Categories Side by Side</h2>
+<h3 id="what-it-looks-like_1">What it looks like</h3>
+<div class="diagram-card"><pre><code>   Orders
+    500 │                          ████
+    400 │        ████        ████  ████
+    300 │  ████  ████  ████  ████  ████
+    200 │  ████  ████  ████  ████  ████
+    100 │  ████  ████  ████  ████  ████
+        └──────────────────────────────
+           Mon   Tue   Wed   Thu   Fri
+</code></pre></div>
+
+<h3 id="the-code_1">The Code</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">days</span>  <span class="o">=</span> <span class="p">[</span><span class="s2">"Mon"</span><span class="p">,</span> <span class="s2">"Tue"</span><span class="p">,</span> <span class="s2">"Wed"</span><span class="p">,</span> <span class="s2">"Thu"</span><span class="p">,</span> <span class="s2">"Fri"</span><span class="p">]</span>
+<span class="n">sales</span> <span class="o">=</span> <span class="p">[</span><span class="mi">300</span><span class="p">,</span> <span class="mi">450</span><span class="p">,</span> <span class="mi">380</span><span class="p">,</span> <span class="mi">420</span><span class="p">,</span> <span class="mi">500</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">days</span><span class="p">,</span> <span class="n">sales</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'coral'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'black'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Daily Orders | Swiggy"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Day"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Orders"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+
+<h3 id="when-to-use-it_1" class="use-yes"><span class="icon"><svg class="icon"><use href="#icon-check"></use></svg></span>When to Use It</h3>
+<p>A bar chart is what you reach for when comparing a measurement across discrete, unordered categories. The height of each bar is the one thing your eye picks up immediately.</p>
+<ul>
+<li>Amazon comparing total revenue by product category (Electronics, Clothing, Books)</li>
+<li>YouTube showing watch time by content genre</li>
+<li>Uber displaying average ride duration by city</li>
+<li>Instagram comparing engagement rates across different content types</li>
+</ul>
+<h3 id="horizontal-bar-chart-when-labels-are-long">Horizontal Bar Chart: When Labels Are Long</h3>
+<p>If your category names run long (city names, full product titles, campaign names), rotate the chart horizontally instead. It keeps the labels from getting cramped or angled:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">days</span><span class="p">,</span> <span class="n">sales</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'teal'</span><span class="p">)</span>   <span class="c1"># categories run down the y-axis; bar length = value</span>
+</code></pre></div>
+
+<p>The bar lengths scale with the data (<code>sales = [300, 450, 380, 420, 500]</code>): Mon is shortest and Fri is longest. Matplotlib draws the first category at the bottom, so Mon sits at the bottom and Fri at the top.</p>
+<div class="diagram-card"><pre><code>   Fri   ████████████████████████████████████████ (500)
+   Thu   ██████████████████████████████████       (420)
+   Wed   ██████████████████████████████           (380)
+   Tue   ████████████████████████████████████     (450)
+   Mon   ████████████████████████                 (300)
+         0       100     200     300     400     500
+</code></pre></div>
+
+<h3 id="when-not-to-use-it_1" class="use-no"><span class="icon"><svg class="icon"><use href="#icon-warn"></use></svg></span>When <em>Not</em> to Use It</h3>
+<p>Avoid bar charts for continuous data with many categories, say 100 countries. The bars collapse into an unreadable wall. Use a line plot if there's order to the data, or aggregate and show only the top N.</p>
+<h3 id="seaborn-countplot-and-barplot">Seaborn: <code>countplot</code> and <code>barplot</code></h3>
+<p>Seaborn has two bar chart variants, and it's worth knowing the difference:</p>
+<ul>
+<li><code>sns.countplot</code> takes a categorical column on the x-axis and counts the occurrences for you automatically. Good for "how many of each?"</li>
+<li><code>sns.barplot</code> takes both an x (category) and a y (value) and draws bars with a 95% confidence interval by default. Good for "what's the average of Y, per category?"</li>
+</ul>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">sns</span><span class="o">.</span><span class="n">countplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"product_category"</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"product_category"</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span> <span class="n">errorbar</span><span class="o">=</span><span class="p">(</span><span class="s1">'ci'</span><span class="p">,</span> <span class="mi">95</span><span class="p">),</span>
+            <span class="n">hue</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">"viridis"</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+<blockquote class="warn">
+<p><strong>Version note:</strong> older tutorials often show <code>ci=95</code> as the parameter here. That was deprecated in Seaborn 0.12 and now only triggers a deprecation warning. <code>errorbar</code> is the current parameter, and it defaults to a 95% confidence interval anyway, so in most cases you can just leave it out.</p>
+</blockquote>
+<hr />
+<h2 id="chart-3-scatter-plot-finding-relationships-between-two-variables"><span class="h-icon"><svg class="icon"><use href="#icon-scatter"></use></svg></span>Chart 3: Scatter Plot, Finding Relationships Between Two Variables</h2>
+<h3 id="what-it-looks-like_2">What it looks like</h3>
+<div class="diagram-card"><pre><code>   Price ($)
+    300 │               ●
+    250 │          ●         ●
+    200 │     ●         ●
+    150 │  ●       ●
+    100 │●    ●
+        └────────────────────────────
+         0    20   40   60   80  100
+                  Rating (out of 100)
+</code></pre></div>
+
+<h3 id="the-code_2">The Code</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"rating"</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"price"</span><span class="p">],</span>
+           <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'steelblue'</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">'white'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Price vs Rating | Airbnb Listings, Mumbai"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Rating Score"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Price per Night ($)"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+
+<h3 id="when-to-use-it_2" class="use-yes"><span class="icon"><svg class="icon"><use href="#icon-check"></use></svg></span>When to Use It</h3>
+<p>A scatter plot shows the relationship, the correlation, between two continuous variables. Each point is one observation, one row in your data.</p>
+<ul>
+<li>Airbnb exploring whether higher-rated listings charge more</li>
+<li>Uber studying whether longer trips earn more (distance vs fare)</li>
+<li>Amazon investigating if more reviews lead to higher prices</li>
+<li>A streaming platform checking whether longer movies have lower completion rates</li>
+</ul>
+<p>The patterns you look for:</p>
+<div class="diagram-card"><pre><code>   Positive            Negative           No Correlation    Curved
+   Correlation         Correlation
+
+   ●                   ●                  ●  ●   ●           ●
+     ●                 ●●                ●    ● ●          ●     ●
+       ●●           ●●               ●  ● ●  ●          ●         ●
+         ●●       ●●                   ●  ●           ●             ●
+           ●    ●●                   ●  ●             ●             ●
+
+   "as X ↑, Y ↑"  "as X ↑, Y ↓"  "no pattern"     "U-shaped"
+</code></pre></div>
+
+<h3 id="when-not-to-use-it_2" class="use-no"><span class="icon"><svg class="icon"><use href="#icon-warn"></use></svg></span>When <em>Not</em> to Use It</h3>
+<p>Scatter plots break down with very large datasets (millions of points), because the dots overlap and pile up into what's called overplotting. Fix it by making the dots transparent (<code>alpha=0.1</code>), switching to a <code>hexbin</code> plot, or adding jitter.</p>
+<h3 id="seaborn-scatterplot-and-regplot">Seaborn: <code>scatterplot</code> and <code>regplot</code></h3>
+<p><code>sns.regplot</code> goes a step further: it draws the scatter plot and fits a regression line through the data, with a shaded confidence band, all in one call.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"distance"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">"vehicle_type"</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"rating"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"price"</span><span class="p">,</span> <span class="n">scatter_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">"alpha"</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">})</span>
+</code></pre></div>
+
+<p>The <code>hue</code> and <code>style</code> parameters add two more dimensions of information without changing the chart type: different colours per city, different marker shapes per vehicle type.</p>
+<hr />
+<h2 id="chart-4-histogram-seeing-the-shape-of-your-data"><span class="h-icon"><svg class="icon"><use href="#icon-histogram"></use></svg></span>Chart 4: Histogram, Seeing the Shape of Your Data</h2>
+<h3 id="what-it-looks-like_3">What it looks like</h3>
+<div class="diagram-card"><pre><code>   Frequency
+    80 │       ████
+    60 │  ████ ████ ████
+    40 │  ████ ████ ████ ████
+    20 │  ████ ████ ████ ████ ████
+     0 │  ████ ████ ████ ████ ████ ████
+        └────────────────────────────────
+           10   20   30   40   50   60
+                    Age (years)
+</code></pre></div>
+
+<h3 id="the-code_3">The Code</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">"age"</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'mediumseagreen'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'white'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Age Distribution of Uber Riders"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Age"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Number of Riders"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+
+<h3 id="what-bins-means">What <code>bins</code> Means</h3>
+<p>A histogram groups continuous numbers into buckets (called bins) and counts how many values fall into each bucket. The <code>bins</code> parameter controls how many buckets to use:</p>
+<div class="diagram-card"><pre><code>   bins=5 (wide buckets)          bins=20 (narrow buckets)
+
+   ████████████                     ████
+   ████████████  ████               ████ ████
+   ████████████  ████  ████         ████ ████ ████
+   ─────────────────────            ────────────────────
+   "rough shape"                    "fine detail"
+</code></pre></div>
+
+<p>Too few bins hide structure; too many create noise. A good starting point is 15–30 bins and adjusting from there.</p>
+<h3 id="the-shapes-youll-see">The Shapes You'll See</h3>
+<p>Understanding histogram shapes is a core data analysis skill:</p>
+<div class="diagram-card"><pre><code>   Normal / Bell           Right-Skewed           Left-Skewed          Bimodal
+   "most people are        "a few very high        "a few very low      "two clusters"
+    average"                values pull the tail"   values pull the tail"
+
+      ████                        ████               ████████
+     ██████                      ██████              ████████████
+    ████████                    █████████              ████████████
+   ██████████                  ████████████               ██████████
+
+   adult heights           app revenue             exam scores         orders by hour
+   (one population)        (a few whales)          (easy exam)         (lunch + dinner)
+</code></pre></div>
+
+<p>Here's a quick way to check the logic: on an easy exam, most students score high, near the top, with only a small tail of low scores from the ones who struggled. That tail sits on the left, at low values, which is what "left-skewed" means. A hard exam is the opposite: scores bunch low, with a small tail of high scorers stretching right. That's the right-skewed case, the same shape as the app revenue example above it.</p>
+<h3 id="when-to-use-it_3" class="use-yes"><span class="icon"><svg class="icon"><use href="#icon-check"></use></svg></span>When to Use It</h3>
+<p>Use a histogram when you want to understand the distribution of a single continuous variable: how spread out it is, where most values cluster, whether it's symmetric, whether there are outliers.</p>
+<ul>
+<li>PhonePe checking the distribution of transaction amounts (are most small, with rare large ones?)</li>
+<li>Spotify analyzing song length distribution across a genre</li>
+<li>Swiggy understanding delivery time distribution (where's the peak? how wide is the spread?)</li>
+<li>Netflix examining hours watched per user per month</li>
+</ul>
+<h3 id="seaborn-histplot-and-kdeplot">Seaborn: <code>histplot</code> and <code>kdeplot</code></h3>
+<p>Seaborn's <code>histplot</code> can overlay a smooth density curve, the KDE (Kernel Density Estimate), that shows the shape without the jaggedness of bins:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span> <span class="n">kde</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"steelblue"</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The KDE (<code>kde=True</code>) is that smooth curve drawn over the bars. Think of it as a smoothed-out histogram, and it makes comparing multiple distributions on the same chart a lot cleaner.</p>
+<hr />
+<h2 id="chart-5-box-plot-for-distribution-spread-and-outliers"><span class="h-icon"><svg class="icon"><use href="#icon-box"></use></svg></span>Chart 5: Box Plot for Distribution, Spread, and Outliers</h2>
+<h3 id="what-it-looks-like_4">What it looks like</h3>
+<div class="diagram-card"><pre><code>                       ○     ← outlier (beyond 1.5 × IQR from the box)
+                       │
+                       ┴     ← upper whisker (max value that ISN'T an outlier)
+                  ┌────────┐
+                  │        │  ← Q3, 75th percentile, top of the box
+                  │────────│  ← Median, 50th percentile, line inside the box
+                  │        │  ← Q1, 25th percentile, bottom of the box
+                  └────────┘
+                       ┬     ← lower whisker (min value that ISN'T an outlier)
+                       │
+
+            IQR (Interquartile Range) = height of the box = Q3 − Q1
+</code></pre></div>
+
+<p>More concretely, with real numbers:</p>
+<div class="diagram-card"><pre><code>   Ride Fare ($)
+
+    50 │              ○                 ← outlier (unusually expensive ride)
+    45 │              │
+    40 │              ┴                 ← upper whisker (highest normal fare)
+       │         ┌─────────┐
+    30 │         │    ┼    │            ← median fare
+       │         └─────────┘
+    20 │              ┬                 ← lower whisker (lowest normal fare)
+       │              │
+    10 │
+       └──────────────────────
+              All Rides
+</code></pre></div>
+
+<h3 id="the-code_4">The Code</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">"fare"</span><span class="p">],</span> <span class="n">patch_artist</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">boxprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">'lightblue'</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Distribution of Ride Fares | Uber"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Fare ($)"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+
+<h3 id="decoding-the-box-plot">Decoding the Box Plot</h3>
+<p>The box plot packs five statistics into one picture:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>What it shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bottom of box (Q1)</td>
+<td>The 25th percentile, 25% of values are below this</td>
+</tr>
+<tr>
+<td>Middle line</td>
+<td>The median, 50% of values are below this</td>
+</tr>
+<tr>
+<td>Top of box (Q3)</td>
+<td>The 75th percentile, 75% of values are below this</td>
+</tr>
+<tr>
+<td>Height of box (IQR)</td>
+<td>Interquartile range = Q3 − Q1. The middle 50% of the data. Wide means spread out, narrow means clustered.</td>
+</tr>
+<tr>
+<td>Whiskers</td>
+<td>Lines extending from the box to the furthest value that is not an outlier (at most 1.5 × IQR beyond the box, by default)</td>
+</tr>
+<tr>
+<td>Dots beyond whiskers</td>
+<td>Outliers, unusually extreme values worth investigating</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="when-to-use-it_4" class="use-yes"><span class="icon"><svg class="icon"><use href="#icon-check"></use></svg></span>When to Use It</h3>
+<p>Box plots are for comparing distributions across categories. You get the full spread and any outliers, not just the average, across multiple groups at a glance.</p>
+<div class="diagram-card"><pre><code>   City:       Mumbai      Delhi       Bangalore
+               ┌──┐         ┌──┐         ┌──┐
+               │  │      ○  │  │         │  │
+               ├──┤         ├──┤         │  │
+               │  │         │  │         ├──┤
+               └──┘         └──┘         └──┘
+               Tight        Outliers     Wide spread
+               distribution  present     (varied fares)
+</code></pre></div>
+
+<ul>
+<li>Uber comparing fare distributions across cities (which city has more variability?)</li>
+<li>Amazon comparing delivery times across warehouses</li>
+<li>Spotify analyzing song popularity scores by genre (is Hip-Hop more consistently popular than Classical?)</li>
+<li>A pharma company comparing test results across treatment groups</li>
+</ul>
+<h3 id="seaborn-boxplot-and-violinplot">Seaborn: <code>boxplot</code> and <code>violinplot</code></h3>
+<p>Seaborn makes comparing multiple groups easy with the <code>x</code> and <code>hue</code> parameters:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">"Set2"</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Passing the same column to <code>hue</code> is how current Seaborn applies a palette per category; <code>legend=False</code> hides the legend, which would only repeat the x-axis labels.</p>
+<p>The violin plot is a box plot's more expressive sibling. It shows the full distribution shape (like a KDE turned sideways) rather than just the five-number summary.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">sns</span><span class="o">.</span><span class="n">violinplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">"muted"</span><span class="p">,</span>
+               <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="s2">"quartile"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   Box Plot            Violin Plot
+
+     ┌──┐              ┃░░░░░░░░┃
+     │  │             ┃░░░░░░░░░░░┃
+     ├──┤             ┃░░░░░░░░░░░░░░┃    ← widest = most common values
+     │  │             ┃░░░░░░░░░░░┃
+     └──┘              ┃░░░░░░░░┃
+
+   shows 5 numbers    shows the full shape
+</code></pre></div>
+
+<p>Use a violin plot when the shape of the distribution matters: whether it's bimodal (two humps), skewed, or has a heavy tail. Use a box plot when the outliers or the IQR itself is what you want to communicate.</p>
+<hr />
+<h2 id="chart-6-heatmap-visualizing-a-matrix-of-numbers"><span class="h-icon"><svg class="icon"><use href="#icon-heatmap"></use></svg></span>Chart 6: Heatmap, Visualizing a Matrix of Numbers</h2>
+<h3 id="what-it-looks-like_5">What it looks like</h3>
+<div class="diagram-card"><pre><code>   Correlation Matrix
+           Price  Rating  Distance  Duration
+   Price   [1.00]  [0.72]   [0.85]    [0.78]     ← darker = stronger relationship
+   Rating  [0.72]  [1.00]   [0.40]    [0.33]
+   Dist    [0.85]  [0.40]   [1.00]    [0.91]
+   Dur     [0.78]  [0.33]   [0.91]    [1.00]
+
+   ░ = weak     ▒ = moderate     ▓ = strong
+</code></pre></div>
+
+<h3 id="the-code_5">The Code</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">corr</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s2">"price"</span><span class="p">,</span> <span class="s2">"rating"</span><span class="p">,</span> <span class="s2">"distance"</span><span class="p">,</span> <span class="s2">"duration"</span><span class="p">]]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>   <span class="c1"># compute correlations</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">".2f"</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"coolwarm"</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Feature Correlation Matrix"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+
+<h3 id="heatmap-parameters-that-matter">Heatmap Parameters That Matter</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>annot=True</code></td>
+<td>Write the number inside each cell</td>
+</tr>
+<tr>
+<td><code>fmt=".2f"</code></td>
+<td>Format numbers to 2 decimal places</td>
+</tr>
+<tr>
+<td><code>cmap="coolwarm"</code></td>
+<td>Blue for negative, red for positive. <code>"viridis"</code> for sequential data.</td>
+</tr>
+<tr>
+<td><code>center=0</code></td>
+<td>Anchors the colour scale at zero, so a diverging cmap like <code>coolwarm</code> stays symmetric around "no correlation"</td>
+</tr>
+<tr>
+<td><code>square=True</code></td>
+<td>Forces the cells to be square</td>
+</tr>
+<tr>
+<td><code>vmin=-1, vmax=1</code></td>
+<td>Fix the colour scale (useful for correlations)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="what-correlation-values-mean">What Correlation Values Mean</h3>
+<div class="diagram-card"><pre><code>   -1.0           -0.5          0.0          +0.5          +1.0
+    │──────────────│─────────────│─────────────│──────────────│
+    Perfect        Moderate      No            Moderate       Perfect
+    negative       negative      relationship  positive       positive
+    (as X↑, Y↓)                              (as X↑, Y↑)
+</code></pre></div>
+
+<p>A value near ±1 means the two variables move closely together in a straight-line way. Near 0 means there's no <em>linear</em> relationship, though the variables can still be related in a curved way (a scatter plot will show it). In a correlation heatmap, the dark red and dark blue cells are the strongest relationships, and the ones worth investigating further.</p>
+<h3 id="when-to-use-it_5" class="use-yes"><span class="icon"><svg class="icon"><use href="#icon-check"></use></svg></span>When to Use It</h3>
+<p>Heatmaps work for any data that lives in a grid, where both rows and columns are meaningful categories. The correlation matrix is the most common use case, but they're also good for:</p>
+<ul>
+<li>User engagement by hour and day (rows are hours, columns are days, values are average orders), which is how Swiggy's operations team spots which hour of which day is the peak</li>
+<li>Product cross-sell patterns, which items get bought together, the kind of thing Amazon's recommendation team looks at</li>
+<li>Sensor data, like temperatures across factory zones over time</li>
+</ul>
+<h3 id="when-not-to-use-it_3" class="use-no"><span class="icon"><svg class="icon"><use href="#icon-warn"></use></svg></span>When <em>Not</em> to Use It</h3>
+<p>Heatmaps lose their value once one dimension has too many categories, say 60 cities or 200 features. The cells get too small to read. Reduce the dimensions first: pick the top 10 most important features, or cluster before plotting.</p>
+<hr />
+<h2 id="chart-7-pairplot-exploring-all-relationships-at-once"><span class="h-icon"><svg class="icon"><use href="#icon-pairplot"></use></svg></span>Chart 7: Pairplot, Exploring All Relationships at Once</h2>
+<h3 id="what-it-looks-like_6">What it looks like</h3>
+<div class="diagram-card"><pre><code>         price        distance        rating
+          │                │                │
+  price ──│── kde          │   scatter      │   scatter
+          │                │                │
+          │                │                │
+  dist ───│── scatter   ───│── kde          │   scatter
+          │                │                │
+          │                │                │
+  rating──│── scatter   ───│── scatter   ───│── kde
+          │                │                │
+</code></pre></div>
+
+<h3 id="the-code_6">The Code</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">sns</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s2">"price"</span><span class="p">,</span> <span class="s2">"distance"</span><span class="p">,</span> <span class="s2">"duration"</span><span class="p">,</span> <span class="s2">"rating"</span><span class="p">,</span> <span class="s2">"city"</span><span class="p">]],</span>
+             <span class="n">hue</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">diag_kind</span><span class="o">=</span><span class="s2">"kde"</span><span class="p">,</span> <span class="n">corner</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"Pairwise Relationships | Ride Data"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.02</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+
+<blockquote>
+<p><strong>Note:</strong> if you're subsetting columns before plotting, make sure the column you pass to <code>hue</code> is included in that subset. It's a common mistake: slice a DataFrame down to just the numeric columns, then reference a category column in <code>hue</code> that got left behind, and you'll get a <code>KeyError</code>.</p>
+</blockquote>
+<h3 id="when-to-use-it_6" class="use-yes"><span class="icon"><svg class="icon"><use href="#icon-check"></use></svg></span>When to Use It</h3>
+<p>A pairplot is a quick exploration tool. It draws every scatter plot of every variable pair in one grid, with distribution plots on the diagonal, and answers "which variables are related?" without you creating a dozen scatter plots by hand.</p>
+<ul>
+<li>Early in any analysis, before you know which variables matter</li>
+<li>When you have 4–8 features and want a bird's-eye view of relationships</li>
+<li>When colouring by category (<code>hue</code>) might reveal patterns, like whether city clusters separate cleanly</li>
+</ul>
+<h3 id="when-not-to-use-it_4" class="use-no"><span class="icon"><svg class="icon"><use href="#icon-warn"></use></svg></span>When <em>Not</em> to Use It</h3>
+<p>A pairplot with more than 8–10 variables becomes a wall of tiny unreadable charts. For high-dimensional data, use a correlation heatmap instead.</p>
+<hr />
+<h2 id="chart-8-subplots-multiple-charts-in-one-figure"><span class="h-icon"><svg class="icon"><use href="#icon-subplots"></use></svg></span>Chart 8: Subplots, Multiple Charts in One Figure</h2>
+<p>Often the best answer to "how do I show X and Y together?" is to put them side by side in one figure rather than combining them into one chart. Subplots do exactly that.</p>
+<h3 id="the-code_7">The Code</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># months, revenue, days and sales come from the earlier examples;</span>
+<span class="c1"># ratings stands in for whatever column you're working with</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># Chart 1: Line plot on the first axes</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">months</span><span class="p">,</span> <span class="n">revenue</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'steelblue'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Revenue Trend"</span><span class="p">)</span>
+
+<span class="c1"># Chart 2: Bar chart on the second axes</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">days</span><span class="p">,</span> <span class="n">sales</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'coral'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Orders by Day"</span><span class="p">)</span>
+
+<span class="c1"># Chart 3: Histogram on the third axes</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">ratings</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'mediumseagreen'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Rating Distribution"</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"Q3 Dashboard | Uber India"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+
+<h3 id="subplot-grid-layouts">Subplot Grid Layouts</h3>
+<div class="diagram-card"><pre><code>   1 row, 3 columns          2 rows, 2 columns
+   plt.subplots(1, 3)        plt.subplots(2, 2)
+
+   ┌──────┬──────┬──────┐    ┌──────┬──────┐
+   │  [0] │  [1] │  [2] │    │ [0,0]│ [0,1]│
+   └──────┴──────┴──────┘    ├──────┼──────┤
+                              │ [1,0]│ [1,1]│
+                              └──────┴──────┘
+   axes[0], axes[1], ...     axes[0,0], axes[0,1], ...
+</code></pre></div>
+
+<h3 id="when-to-use-it_7" class="use-yes"><span class="icon"><svg class="icon"><use href="#icon-check"></use></svg></span>When to Use It</h3>
+<p>Subplots are good for dashboards and reports, where you want several related charts together so they can be compared at a glance. Instead of making a viewer click through four separate charts, you put them on one page: trend over time on the left, breakdown by category in the middle, distribution on the right.</p>
+<hr />
+<h2 id="chart-9-strip-plot-and-swarm-plot-showing-every-individual-data-point"><span class="h-icon"><svg class="icon"><use href="#icon-strip"></use></svg></span>Chart 9: Strip Plot and Swarm Plot, Showing Every Individual Data Point</h2>
+<h3 id="the-problem-with-box-plots-and-bar-charts">The Problem with Box Plots and Bar Charts</h3>
+<p>Bar charts and box plots summarise data: they show you an average, a median, or a spread. But summary statistics can hide things. Two datasets can share nearly identical summary numbers and still look completely different once you plot every point.</p>
+<p>The classic demonstration of this is Anscombe's Quartet: four small datasets that share nearly identical means, variances, and correlations, yet look completely different once you plot them point by point.</p>
+<div class="diagram-card"><pre><code>   Dataset A               Dataset B               Dataset C
+   ●  ●  ●  ●            ●●●●                    ●
+      ●  ●  ●  ●            ●●●●●                  ●●
+         ●  ●                 ●●●●                   ●●●●
+                                 ●                    ●●●
+                                                        ●
+   Mean ≈ 7.5            Mean ≈ 7.5              Mean ≈ 7.5
+   Looks like a spread   Looks like a curve      An outlier changes everything
+</code></pre></div>
+
+<p>Going only by the summary numbers, the same mean, the same rough spread, you'd assume these were three similar datasets. Strip and swarm plots apply that same lesson to categorical comparisons. They show every individual data point instead of a summary, so nothing is hidden behind an average.</p>
+<h3 id="strip-plot">Strip Plot</h3>
+<div class="diagram-card"><pre><code>   Fare ($)
+    50 │   ●
+       │  ●●
+    40 │  ●●●
+       │ ●●●●●
+    30 │●●●●●●
+       │ ●●●●
+    20 │  ●●
+       │   ●
+        ─────────────
+           UberX
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">stripplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"vehicle_type"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">"vehicle_type"</span><span class="p">,</span>
+              <span class="n">jitter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">"Set2"</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Fare Distribution by Vehicle Type | Uber"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Vehicle Type"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Fare ($)"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+
+<p>The <code>jitter=True</code> parameter nudges each point slightly left or right, so they don't all stack on the same vertical line and disappear into each other. Without jitter, every point at the same value sits exactly on top of the last one and becomes invisible.</p>
+<h3 id="swarm-plot-no-overlap-ever">Swarm Plot: No Overlap, Ever</h3>
+<p>A swarm plot takes this further. Instead of random jitter, it arranges points so they never overlap, spreading them into a clean "bee swarm" shape. The width of the swarm at any height tells you how many data points sit at that value.</p>
+<div class="diagram-card"><pre><code>   Fare ($)
+    50 │      ●
+    40 │    ●●●●
+    30 │  ●●●●●●●●
+    20 │    ●●●●●
+    10 │      ●●
+        ─────────
+          UberX
+   Width of swarm ≈ how many rides had that fare
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">sns</span><span class="o">.</span><span class="n">swarmplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"vehicle_type"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">"vehicle_type"</span><span class="p">,</span>
+              <span class="n">palette</span><span class="o">=</span><span class="s2">"muted"</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+<h3 id="the-power-move-overlay-on-a-box-plot">The Power Move: Overlay on a Box Plot</h3>
+<p>The most information-rich combination is a box plot (showing the statistics) with a strip plot on top of it (showing the raw data). You get both the summary and the individual points in one view:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">"pastel"</span><span class="p">,</span>
+            <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">stripplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+              <span class="n">jitter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Fare Distribution by City | Box + Raw Points"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   Box plot + Strip plot overlay
+
+   ●●    ┌──┐  ●●
+    ●    │  │  ●
+   ● ●   ├──┤  ●●●
+   ●     │  │  ●
+    ●    └──┘  ●
+   ────────────────
+     Mumbai   Delhi
+   Box = summary    Dots = individual rides
+</code></pre></div>
+
+<h3 id="when-to-use-it_8" class="use-yes"><span class="icon"><svg class="icon"><use href="#icon-check"></use></svg></span>When to Use It</h3>
+<p>Use strip or swarm plots when your sample size is small to moderate, up to a few hundred points, and you want the audience to see the actual data rather than a summary that could be misleading.</p>
+<ul>
+<li>A clinical trial comparing treatment outcomes across three groups, where seeing every patient matters</li>
+<li>Comparing employee salaries across departments, where individual points reveal clusters an average would hide</li>
+<li>Airbnb showing price spread across property types: the box plot might look the same, but the strip plot reveals that "Entire Apartment" is actually bimodal, a budget cluster and a luxury cluster</li>
+</ul>
+<h3 id="when-not-to-use-it_5" class="use-no"><span class="icon"><svg class="icon"><use href="#icon-warn"></use></svg></span>When <em>Not</em> to Use It</h3>
+<p>With very large datasets, 10,000+ rows, every point overlaps and the swarm turns into a solid mass. At that scale, use a violin plot or a KDE instead.</p>
+<hr />
+<h2 id="chart-10-joint-plot-scatter-and-distribution-in-one"><span class="h-icon"><svg class="icon"><use href="#icon-joint"></use></svg></span>Chart 10: Joint Plot, Scatter and Distribution in One</h2>
+<p>The joint plot is one of Seaborn's more elegant charts. It combines:</p>
+<ul>
+<li>a scatter plot in the centre: the relationship between two variables</li>
+<li>a histogram or KDE along the top: the distribution of the x variable</li>
+<li>a histogram or KDE along the right side: the distribution of the y variable</li>
+</ul>
+<p>You get the relationship and the shape of each variable in one glance.</p>
+<h3 id="what-it-looks-like_7">What it looks like</h3>
+<div class="diagram-card"><pre><code>                ── Distribution of Duration ──
+                      ▄▄  ██  ▄▄
+                   ▄▄ ██  ██  ██ ▄▄
+              ┌──────────────────────────┐ ┌─────┐
+            F │   ●        ●●            │ │██   │
+            a │      ●●●  ●●●            │ │████ │  Distribution
+            r │   ●     ●●● ●●           │ │███  │  of Fare
+            e │     ●●●●  ●  ●  ●        │ │█    │
+              └──────────────────────────┘ └─────┘
+                        Duration
+                 ← scatter in the middle →
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"duration"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span>
+                  <span class="n">kind</span><span class="o">=</span><span class="s2">"scatter"</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+                  <span class="n">marginal_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">g</span><span class="o">.</span><span class="n">set_axis_labels</span><span class="p">(</span><span class="s2">"Duration (min)"</span><span class="p">,</span> <span class="s2">"Fare ($)"</span><span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"Duration vs. Fare with Marginal Distributions"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.02</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+
+<h3 id="the-kind-parameter-four-views-of-the-same-relationship">The <code>kind</code> Parameter: Four Views of the Same Relationship</h3>
+<p>The <code>kind</code> parameter changes what's drawn in the centre while keeping the marginals:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th><code>kind=</code></th>
+<th>Centre shows</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"scatter"</code></td>
+<td>Individual dots</td>
+<td>Small to medium datasets</td>
+</tr>
+<tr>
+<td><code>"kde"</code></td>
+<td>Density contours</td>
+<td>Large datasets, seeing clusters</td>
+</tr>
+<tr>
+<td><code>"hex"</code></td>
+<td>Hexagonal bins (colour = count)</td>
+<td>Very large datasets</td>
+</tr>
+<tr>
+<td><code>"reg"</code></td>
+<td>Scatter + regression line</td>
+<td>Measuring the trend</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">sns</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"duration"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"kde"</span><span class="p">)</span>    <span class="c1"># smooth density</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"duration"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"hex"</span><span class="p">)</span>    <span class="c1"># hexagonal bins</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"duration"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"fare"</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"reg"</span><span class="p">)</span>    <span class="c1"># with trend line</span>
+</code></pre></div>
+
+<h3 id="when-to-use-it_9" class="use-yes"><span class="icon"><svg class="icon"><use href="#icon-check"></use></svg></span>When to Use It</h3>
+<p>A joint plot works well when you want to report on one specific relationship and also want the reader to see both variables' distributions, without needing two separate charts. It's a self-contained exploratory report in a single figure.</p>
+<ul>
+<li>Uber asking: "Does longer duration always mean higher fare, and what are the typical duration and fare distributions?"</li>
+<li>Spotify: "Is there a relationship between audio energy and danceability, and are either of these normally distributed?"</li>
+<li>An e-commerce team: "Do products with higher ratings actually sell more units?"</li>
+</ul>
+<hr />
+<h2 id="chart-11-facetgrid-the-same-chart-for-every-category"><span class="h-icon"><svg class="icon"><use href="#icon-facet"></use></svg></span>Chart 11: FacetGrid, the Same Chart for Every Category</h2>
+<p>A FacetGrid takes one chart and repeats it for every category in your data, arranged in a grid. Instead of cramming five city comparisons onto one scatter plot with five colours, you get five separate scatter plots side by side, each one clean and readable on its own.</p>
+<h3 id="what-it-looks-like_8">What it looks like</h3>
+<div class="diagram-card"><pre><code>   ┌─────────────┬─────────────┬─────────────┐
+   │   Mumbai    │    Delhi    │  Bangalore  │
+   │     ●  ●   │   ●         │    ●●       │
+   │   ●●  ●    │    ●●       │  ●  ●●      │
+   │  ●   ●     │  ●●●●      │   ●   ●     │
+   └─────────────┴─────────────┴─────────────┘
+   Same chart type, same axes, different city
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">"city"</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">,</span> <span class="s2">"distance"</span><span class="p">,</span> <span class="s2">"fare"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">set_axis_labels</span><span class="p">(</span><span class="s2">"Distance (miles)"</span><span class="p">,</span> <span class="s2">"Fare ($)"</span><span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">set_titles</span><span class="p">(</span><span class="n">col_template</span><span class="o">=</span><span class="s2">"</span><span class="si">{col_name}</span><span class="s2">"</span><span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"Distance vs. Fare by City"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.02</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+
+<h3 id="key-facetgrid-parameters">Key FacetGrid Parameters</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>What it controls</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>col="city"</code></td>
+<td>Which column creates the panels (one per unique value)</td>
+</tr>
+<tr>
+<td><code>row="time_of_day"</code></td>
+<td>Adds a second dimension of rows</td>
+</tr>
+<tr>
+<td><code>col_wrap=3</code></td>
+<td>Wrap into a new row after 3 columns (prevents one giant row)</td>
+</tr>
+<tr>
+<td><code>sharey=True</code></td>
+<td>All panels share the same y-axis scale (enables fair comparison)</td>
+</tr>
+<tr>
+<td><code>height=4</code></td>
+<td>How tall each individual panel is</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="col-vs-row-vs-both"><code>col</code> vs <code>row</code> vs Both</h3>
+<div class="diagram-card"><pre><code>   col="city" only              col="city", row="time"
+
+   ┌──┬──┬──┐                  ┌──┬──┬──┐   ← Morning
+   │M │D │B │                  ├──┼──┼──┤
+   └──┴──┴──┘                  │M │D │B │   ← Evening
+                                └──┴──┴──┘
+   3 panels in 1 row            6 panels in a 2×3 grid
+</code></pre></div>
+
+<h3 id="when-to-use-it_10" class="use-yes"><span class="icon"><svg class="icon"><use href="#icon-check"></use></svg></span>When to Use It</h3>
+<p>A FacetGrid is worth reaching for whenever you want to compare the same pattern across groups without the visual noise of overlapping, colour-coded series.</p>
+<ul>
+<li>Netflix: "How does watch-time-vs-episode-count look differently across genres?"</li>
+<li>Amazon: "Is the rating-vs-price relationship the same for Electronics, Books, and Clothing?"</li>
+<li>Swiggy: "Does order volume peak at the same hour in Mumbai, Delhi, and Bangalore?"</li>
+</ul>
+<p>The advantage over cramming everything onto one chart is that side-by-side panels on shared axes let the eye compare instantly, with no legend to decode.</p>
+<hr />
+<h2 id="choosing-the-right-chart-a-decision-guide"><span class="h-icon"><svg class="icon"><use href="#icon-guide"></use></svg></span>Choosing the Right Chart: A Decision Guide</h2>
+<p>The most common mistake beginners make is picking a chart type they like the look of, rather than one that fits the data. Here's the decision framework:</p>
+<div class="diagram-card"><pre><code>   What do you want to show?
+   │
+   ├── CHANGE OVER TIME?
+   │       └── LINE PLOT
+   │
+   ├── COMPARISON ACROSS CATEGORIES?
+   │       ├── A few categories (≤ 10)  →  BAR CHART
+   │       └── Long category names      →  HORIZONTAL BAR CHART
+   │
+   ├── RELATIONSHIP BETWEEN TWO VARIABLES?
+   │       ├── Both continuous          →  SCATTER PLOT
+   │       ├── With a regression line   →  sns.regplot
+   │       └── Plus both distributions  →  JOINT PLOT
+   │
+   ├── DISTRIBUTION OF ONE VARIABLE?
+   │       ├── Overall shape            →  HISTOGRAM
+   │       ├── Compare groups/shape     →  BOX PLOT or VIOLIN PLOT
+   │       └── Every individual point   →  STRIP PLOT or SWARM PLOT
+   │
+   ├── RELATIONSHIPS IN A GRID?
+   │       ├── All variable pairs       →  PAIRPLOT
+   │       └── Correlation matrix       →  HEATMAP
+   │
+   ├── SAME QUESTION, SPLIT BY CATEGORY?
+   │       └── FACETGRID
+   │
+   └── MULTIPLE DIFFERENT QUESTIONS AT ONCE?
+           └── SUBPLOTS
+</code></pre></div>
+
+<h3 id="the-chart-no-one-talks-you-out-of-pie-charts">The Chart No One Talks You Out Of: Pie Charts</h3>
+<p>Pie charts are the most widely used chart type outside of data science, and the most widely criticised inside it. The human eye is good at comparing bar heights side by side, but bad at comparing slice angles and areas. Can you tell, just by looking, whether a 24% slice is bigger than a 26% slice? Not reliably. A bar chart makes that comparison instant.</p>
+<p>Use a pie chart only if you have 3-5 categories and the proportions are clearly different, something like 60/25/15. In almost any other case, a bar chart says the same thing more clearly. And skip 3D pie charts entirely: the perspective distortion makes slices look larger or smaller than they really are.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">pie</span><span class="p">(</span><span class="n">sizes</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">autopct</span><span class="o">=</span><span class="s1">'</span><span class="si">%1.0f%%</span><span class="s1">'</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">"Set2"</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Market Share | Top 3 Ride-Sharing Apps"</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h2 id="styling-your-charts-making-them-look-professional"><span class="h-icon"><svg class="icon"><use href="#icon-style"></use></svg></span>Styling Your Charts: Making Them Look Professional</h2>
+<p>A technically correct chart that looks ugly loses its audience. Both Matplotlib and Seaborn offer styling tools that require almost no extra code.</p>
+<h3 id="seaborn-themes">Seaborn Themes</h3>
+<p><code>sns.set_theme()</code> applies a clean style globally, and every chart after it will use it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"whitegrid"</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">"muted"</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.2</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The four most useful styles:</p>
+<div class="diagram-card"><pre><code>   "whitegrid"    "darkgrid"     "white"        "ticks"
+   ┌────────┐     ┌════════┐     ┌────────┐     ┌────────┐
+   │░░│░░│░░│     │▒▒│▒▒│▒▒│     │        │     │        │
+   │──┼──┼──│     │▒▒│▒▒│▒▒│     │        │     │  ticks │
+   │░░│░░│░░│     │▒▒│▒▒│▒▒│     │        │     │  only  │
+   └────────┘     └════════┘     └────────┘     └────────┘
+   White with     Dark with      Clean white    Minimal
+   grid lines     grid (default) no grid        ticks
+</code></pre></div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Style</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"whitegrid"</code></td>
+<td>Most general use, clean and readable</td>
+</tr>
+<tr>
+<td><code>"white"</code></td>
+<td>Presentations, posters, minimalist</td>
+</tr>
+<tr>
+<td><code>"darkgrid"</code></td>
+<td>Dense charts where gridlines help navigation</td>
+</tr>
+<tr>
+<td><code>"ticks"</code></td>
+<td>Academic papers, very clean</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="colour-palettes">Colour Palettes</h3>
+<p>The <code>palette</code> parameter controls the colours used for different categories. Seaborn has many built-in palettes grouped by purpose:</p>
+<div class="diagram-card"><pre><code>   QUALITATIVE (for categories: each colour = different group)
+   "Set1"      ● ● ● ● ● ● ● ● ●    (bold, distinct)
+   "Set2"      ● ● ● ● ● ● ● ● ●    (softer, muted)
+   "tab10"     ● ● ● ● ● ● ● ● ● ●  (Matplotlib default)
+   "muted"     ● ● ● ● ● ● ● ● ●    (professional, subdued)
+
+   SEQUENTIAL (for continuous data: light to dark)
+   "Blues"     ░ ▒ ▓ ███            (white → dark blue)
+   "viridis"   ░ ▒ ▓ ███            (perceptually uniform)
+   "YlOrRd"    ░ ▒ ▓ ███            (yellow → red)
+
+   DIVERGING (for data that has a meaningful centre, like correlations)
+   "coolwarm"  ── ░ │ ▓ ──          (blue → white → red)
+   "RdBu"      ── ░ │ ▓ ──          (red → white → blue)
+</code></pre></div>
+
+<p>The rule of thumb: use a qualitative palette for categorical data, a sequential palette for ordered or continuous data (like heatmaps with positive values only), and a diverging palette when your data has a meaningful midpoint (like correlations from -1 to +1).</p>
+<h3 id="essential-chart-labels-never-skip-these">Essential Chart Labels: Never Skip These</h3>
+<p>A chart without proper labels forces the reader to guess what they're looking at. These four elements are non-negotiable:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Clear, descriptive title that states the finding"</span><span class="p">,</span>
+             <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"What the x-axis represents (unit)"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"What the y-axis represents (unit)"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"What the colours/markers mean"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div>
+
+<p>A good title states the finding, not just the topic. "Revenue by Month" is a topic. "Revenue grew 40% in Q3, driven by festive sales" is a finding. A chart that gives you the conclusion in its own title saves the reader some thinking.</p>
+<hr />
+<h2 id="putting-it-all-together-a-real-data-science-workflow"><span class="h-icon"><svg class="icon"><use href="#icon-workflow"></use></svg></span>Putting It All Together: A Real Data Science Workflow</h2>
+<p>Here's how a data scientist at a company like Swiggy would move through a full visualization workflow for a single business question: <em>"Why are delivery times increasing in Mumbai on weekends?"</em></p>
+<p><strong>Step 1: First look at the distributions (Histogram)</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">mumbai</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">"city"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"Mumbai"</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">mumbai</span><span class="p">[</span><span class="n">mumbai</span><span class="p">[</span><span class="s2">"day_type"</span><span class="p">]</span><span class="o">==</span><span class="s2">"Weekday"</span><span class="p">][</span><span class="s2">"delivery_mins"</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+             <span class="n">kde</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"steelblue"</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">mumbai</span><span class="p">[</span><span class="n">mumbai</span><span class="p">[</span><span class="s2">"day_type"</span><span class="p">]</span><span class="o">==</span><span class="s2">"Weekend"</span><span class="p">][</span><span class="s2">"delivery_mins"</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+             <span class="n">kde</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"coral"</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Weekday Delivery Times"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Weekend Delivery Times"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Delivery Time (minutes)"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"Mumbai: Weekend vs Weekday Delivery Distribution"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</code></pre></div>
+
+<p><em>Finding</em>: the weekend distribution is right-skewed. Most deliveries are fine, but a long tail of very slow ones is pulling the average up.</p>
+<p><strong>Step 2: Compare the spread and outliers by hour (Box Plot)</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">mumbai</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"hour"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"delivery_mins"</span><span class="p">,</span>
+            <span class="n">hue</span><span class="o">=</span><span class="s2">"day_type"</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">"Set2"</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Delivery Time by Hour | Mumbai"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Hour of Day"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Delivery Time (minutes)"</span><span class="p">)</span>
+</code></pre></div>
+
+<p><em>Finding</em>: the 7pm–10pm window on weekends has far more outliers (dots above the whisker). That points to a surge in demand the fleet can't handle.</p>
+<p><strong>Step 3: See where delays correlate with order volume (Scatter + Trend)</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># weekend_df: Mumbai weekend data summarised to one row per zone and hour,</span>
+<span class="c1"># with orders_per_hour and avg_delivery_mins columns</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">weekend_df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"orders_per_hour"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"avg_delivery_mins"</span><span class="p">,</span>
+            <span class="n">scatter_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">"alpha"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span> <span class="n">line_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"red"</span><span class="p">},</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"More Orders → Slower Delivery (Weekend, Mumbai)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Orders per Hour"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Avg Delivery Time (minutes)"</span><span class="p">)</span>
+</code></pre></div>
+
+<p><em>Finding</em>: there's a strong positive correlation. As orders increase, so do delivery times, and the regression line puts a number on it.</p>
+<p><strong>Step 4: Check if the pattern is the same across zones (FacetGrid)</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">weekend_df</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">"zone"</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">,</span> <span class="s2">"hour"</span><span class="p">,</span> <span class="s2">"avg_delivery_mins"</span><span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">set_axis_labels</span><span class="p">(</span><span class="s2">"Hour"</span><span class="p">,</span> <span class="s2">"Avg Delivery (min)"</span><span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">set_titles</span><span class="p">(</span><span class="s2">"</span><span class="si">{col_name}</span><span class="s2">"</span><span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"Weekend Delivery by Hour | Mumbai Zones"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.02</span><span class="p">)</span>
+</code></pre></div>
+
+<p><em>Finding</em>: South Mumbai and Bandra spike hardest at 8pm; Thane and Andheri stay much flatter. The problem is concentrated in specific zones, not citywide.</p>
+<p><strong>Conclusion delivered to operations team:</strong></p>
+<blockquote>
+<p>"Weekend delivery slowdowns are concentrated in South Mumbai and Bandra between 7pm–10pm, driven by order volumes that exceed fleet capacity in those zones. Redistributing 20% of rider allocation from Andheri to those zones during peak weekend hours should reduce P90 delivery time by an estimated 8 minutes."</p>
+</blockquote>
+<p>This is the actual point of visualization: turning raw data into a precise, actionable statement for someone who has to act on it.</p>
+<hr />
+<h2 id="quick-reference-summary"><span class="h-icon"><svg class="icon"><use href="#icon-table"></use></svg></span>Quick Reference Summary</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Chart</th>
+<th>Matplotlib Code</th>
+<th>Seaborn Code</th>
+<th>Best For</th>
+<th>Avoid When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Line Plot</strong></td>
+<td><code>ax.plot(x, y)</code></td>
+<td><code>sns.lineplot(data, x, y, hue)</code></td>
+<td>Trends over time</td>
+<td>No natural order on x-axis</td>
+</tr>
+<tr>
+<td><strong>Bar Chart</strong></td>
+<td><code>ax.bar(x, y)</code></td>
+<td><code>sns.barplot(data, x, y)</code></td>
+<td>Comparing category averages</td>
+<td>Too many categories (&gt;15)</td>
+</tr>
+<tr>
+<td><strong>H. Bar Chart</strong></td>
+<td><code>ax.barh(x, y)</code></td>
+<td><code>sns.barplot(orient='h')</code></td>
+<td>Long category labels</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><strong>Count Plot</strong></td>
+<td>(manual)</td>
+<td><code>sns.countplot(data, x)</code></td>
+<td>Counting occurrences</td>
+<td>Comparing averages</td>
+</tr>
+<tr>
+<td><strong>Scatter Plot</strong></td>
+<td><code>ax.scatter(x, y)</code></td>
+<td><code>sns.scatterplot(data, x, y, hue)</code></td>
+<td>Relationship between 2 continuous vars</td>
+<td>Millions of points</td>
+</tr>
+<tr>
+<td><strong>Regression Plot</strong></td>
+<td>(manual)</td>
+<td><code>sns.regplot(data, x, y)</code></td>
+<td>Scatter + trend line</td>
+<td>Categorical x-axis</td>
+</tr>
+<tr>
+<td><strong>Histogram</strong></td>
+<td><code>ax.hist(x, bins)</code></td>
+<td><code>sns.histplot(data, x, kde=True)</code></td>
+<td>Distribution of 1 variable</td>
+<td>Comparing many groups</td>
+</tr>
+<tr>
+<td><strong>KDE Plot</strong></td>
+<td>(manual)</td>
+<td><code>sns.kdeplot(data, x, hue, fill)</code></td>
+<td>Smooth shape of distribution</td>
+<td>Small datasets</td>
+</tr>
+<tr>
+<td><strong>Box Plot</strong></td>
+<td><code>ax.boxplot(x)</code></td>
+<td><code>sns.boxplot(data, x, y)</code></td>
+<td>Spread, outliers, group comparison</td>
+<td>Shape of distribution matters</td>
+</tr>
+<tr>
+<td><strong>Violin Plot</strong></td>
+<td>(complex)</td>
+<td><code>sns.violinplot(data, x, y)</code></td>
+<td>Distribution shape across groups</td>
+<td>Unfamiliar audiences</td>
+</tr>
+<tr>
+<td><strong>Strip Plot</strong></td>
+<td>(manual)</td>
+<td><code>sns.stripplot(data, x, y, jitter)</code></td>
+<td>All individual points per category</td>
+<td>Very large datasets</td>
+</tr>
+<tr>
+<td><strong>Swarm Plot</strong></td>
+<td>(manual)</td>
+<td><code>sns.swarmplot(data, x, y)</code></td>
+<td>Points with no overlap</td>
+<td>Datasets &gt; ~500 rows</td>
+</tr>
+<tr>
+<td><strong>Joint Plot</strong></td>
+<td>(manual)</td>
+<td><code>sns.jointplot(data, x, y, kind)</code></td>
+<td>Scatter + both marginal distributions</td>
+<td>Multiple comparisons</td>
+</tr>
+<tr>
+<td><strong>Heatmap</strong></td>
+<td>(manual)</td>
+<td><code>sns.heatmap(matrix, annot, cmap)</code></td>
+<td>Correlation matrix, grid data</td>
+<td>Too many categories</td>
+</tr>
+<tr>
+<td><strong>Pairplot</strong></td>
+<td>(manual)</td>
+<td><code>sns.pairplot(df, hue, diag_kind)</code></td>
+<td>Quick EDA across all variable pairs</td>
+<td>More than 8–10 variables</td>
+</tr>
+<tr>
+<td><strong>FacetGrid</strong></td>
+<td>(manual)</td>
+<td><code>sns.FacetGrid(df, col, row)</code></td>
+<td>Same chart replicated per category</td>
+<td>Few categories (use <code>hue</code> instead)</td>
+</tr>
+<tr>
+<td><strong>Pie Chart</strong></td>
+<td><code>ax.pie(sizes, labels)</code></td>
+<td>(rarely used)</td>
+<td>3–5 categories, big differences</td>
+<td>More than 5 categories</td>
+</tr>
+<tr>
+<td><strong>Subplots</strong></td>
+<td><code>plt.subplots(r, c)</code></td>
+<td>Combined with any Seaborn chart</td>
+<td>Dashboards, multiple questions</td>
+<td>Single focused story</td>
+</tr>
+<tr>
+<td><strong>Styling</strong></td>
+<td><code>plt.style.use(...)</code></td>
+<td><code>sns.set_theme(style, palette)</code></td>
+<td>Professional appearance</td>
+<td>N/A, always use it</td>
+</tr>
+</tbody>
+</table></div>
+
+      <div class="article-end">
+        <p><strong>Data visualization is part technical, part editorial.</strong> The technical part, knowing which function produces which chart, is the easy half. The editorial part is harder: deciding what to show, to whom, and in what form, and that's what separates a chart that confuses from one that convinces. Every element on the chart should earn its place; if a colour, label, or line isn't helping the viewer understand something, cut it. The best charts feel effortless to read because someone put in the work to make them that way.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="f-left">Python Data Science Series &nbsp;/&nbsp; Article 13 of the course</div>
+  <div class="f-right"><a href="#top">Back to top ↑</a></div>
+</footer>
+<script>
+(function(){
+  var t=document.getElementById('navToggle'),s=document.getElementById('sidebar');
+  if(t&&s){t.addEventListener('click',function(){s.classList.toggle('open');var o=s.classList.contains('open');t.innerHTML=o?'<svg class="icon"><use href="#icon-close"></use></svg>':'<svg class="icon"><use href="#icon-menu"></use></svg>';});s.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){s.classList.remove('open');t.innerHTML='<svg class="icon"><use href="#icon-menu"></use></svg>';});});}
+  var tl=Array.prototype.slice.call(document.querySelectorAll('.toc a')),sc=tl.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+  if('IntersectionObserver' in window&&sc.length){var bi={};tl.forEach(function(a){bi[a.getAttribute('href').slice(1)]=a;});var obs=new IntersectionObserver(function(es){es.forEach(function(e){var l=bi[e.target.id];if(!l)return;if(e.isIntersecting){tl.forEach(function(a){a.classList.remove('active');});l.classList.add('active');}});},{rootMargin:'-15% 0px -70% 0px',threshold:0});sc.forEach(function(s){obs.observe(s);});}
+  document.querySelectorAll('.code-card').forEach(function(c){var b=c.querySelector('.copy-btn'),e=c.querySelector('code');if(!b||!e)return;b.addEventListener('click',function(){var tx=e.innerText,done=function(){var o=b.innerHTML;b.innerHTML='<svg class="icon"><use href="#icon-check"></use></svg> Copied';setTimeout(function(){b.innerHTML=o;},1600);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(tx).then(done,done);else{var ta=document.createElement('textarea');ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(x){}document.body.removeChild(ta);done();}});});
+})();
+</script>
+</body>
+</html>
