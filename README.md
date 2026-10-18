@@ -12,8 +12,9 @@ The notebooks are the place to practice. The articles are the place to actually 
  
 | Topic | Article |
 |---|---|
-| NumPy | 🔗 [Read Article](https://shikharkumar13.github.io/Numpy-Pandas-Data_Wrangling/Numpy.html) |
-| Pandas | 🔗 [Read Article](https://shikharkumar13.github.io/Numpy-Pandas-Data_Wrangling/Pandas.html) |
-| Data Wrangling | 🔗 [Read Article](https://shikharkumar13.github.io/Numpy-Pandas-Data_Wrangling/data_wrangling.html) |
+| NumPy | [Read Article](https://shikharkumar13.github.io/Numpy-Pandas-Data_Wrangling/Numpy.html) |
+| Pandas | [Read Article](https://shikharkumar13.github.io/Numpy-Pandas-Data_Wrangling/Pandas.html) |
+| Data Visualization | [Read Article](https://shikharkumar13.github.io/Numpy-Pandas-Data_Wrangling/Data_Visualization.html)
+| Data Wrangling | [Read Article](https://shikharkumar13.github.io/Numpy-Pandas-Data_Wrangling/data_wrangling.html) |
  
-More rows will be added here as each new topic's companion article is published.
+
